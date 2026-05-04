@@ -1,0 +1,149 @@
+<div class="usuarios-page">
+  <div class="header">
+    <h2>Administración de usuarios</h2>
+    <p>Crea usuarios, asigna roles de EDD, activa/inactiva accesos y restablece contraseñas.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>{{ title() }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label for="documento">Documento</label>
+          <input id="documento" type="text" formControlName="documento" />
+          <small *ngIf="form.controls.documento.touched && form.controls.documento.invalid">
+            El documento es obligatorio.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="nombre">Nombre completo</label>
+          <input id="nombre" type="text" formControlName="nombre" />
+          <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="email">Correo / Login</label>
+          <input id="email" type="text" formControlName="email" />
+          <small *ngIf="form.controls.email.touched && form.controls.email.invalid">
+            Ingresa un correo válido.
+          </small>
+        </div>
+
+        <div class="field" *ngIf="!isEditing()">
+          <label for="clave">Contraseña temporal</label>
+          <input id="clave" type="password" formControlName="clave" />
+          <small *ngIf="form.controls.clave.touched && form.controls.clave.invalid">
+            La contraseña temporal es obligatoria y debe tener al menos 6 caracteres.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="rol">Rol en EDD</label>
+          <select id="rol" formControlName="rol">
+            <option value="ADMIN">ADMIN</option>
+            <option value="EVALUADOR">EVALUADOR</option>
+          </select>
+        </div>
+
+        <div class="field checkbox-field" *ngIf="isEditing()">
+          <label>
+            <input type="checkbox" formControlName="activo" />
+            Usuario activo
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : (isEditing() ? 'Actualizar rol' : 'Crear usuario') }}
+          </button>
+
+          <button type="button" class="secondary" (click)="cancelarEdicion()">
+            Limpiar
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+
+      <div class="message error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="list-header">
+        <h3>Usuarios registrados</h3>
+        <button type="button" class="secondary" (click)="cargarUsuarios()" [disabled]="loading()">
+          Recargar
+        </button>
+      </div>
+
+      <div *ngIf="loading()" class="empty-state">Cargando usuarios...</div>
+
+      <div *ngIf="!loading() && usuarios().length === 0" class="empty-state">
+        No hay usuarios configurados.
+      </div>
+
+      <table *ngIf="!loading() && usuarios().length > 0">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Nombre</th>
+            <th>Correo/Login</th>
+            <th>Rol</th>
+            <th>Activo</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let usuario of usuarios()">
+            <td>{{ usuario.documento }}</td>
+            <td>{{ usuario.nombre }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>{{ usuario.rol }}</td>
+            <td>{{ usuario.activo ? 'Sí' : 'No' }}</td>
+
+            <td class="actions-col">
+              <button type="button" class="small" (click)="editar(usuario)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="small"
+                [class.warning]="usuario.activo"
+                [class.success]="!usuario.activo"
+                (click)="cambiarEstado(usuario)"
+                [disabled]="changingStateId() === usuario.idUsuario">
+                {{
+                  changingStateId() === usuario.idUsuario
+                    ? 'Procesando...'
+                    : (usuario.activo ? 'Inactivar' : 'Activar')
+                }}
+              </button>
+
+              <button
+                type="button"
+                class="small secondary"
+                (click)="resetPassword(usuario)"
+                [disabled]="resettingPasswordId() === usuario.idUsuario">
+                {{
+                  resettingPasswordId() === usuario.idUsuario
+                    ? 'Restableciendo...'
+                    : 'Reset clave'
+                }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

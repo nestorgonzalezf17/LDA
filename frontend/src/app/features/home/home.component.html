@@ -1,0 +1,164 @@
+<div class="home-page">
+  <div class="header">
+    <div>
+      <h2>Inicio</h2>
+      <p>Monitorea el estado general de las evaluaciones de desempeño.</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="field">
+        <label for="idEmpresa">Empresa</label>
+        <select id="idEmpresa" [formControl]="form.controls.idEmpresa" (change)="onEmpresaChange()">
+          <option [ngValue]="null">Todas</option>
+          <option *ngFor="let empresa of empresas()" [ngValue]="empresa.idEmpresa">
+            {{ empresa.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <button type="button" (click)="cargarDashboard()" [disabled]="loading()">
+        {{ loading() ? 'Actualizando...' : 'Actualizar' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="message error" *ngIf="errorMessage()">
+    {{ errorMessage() }}
+  </div>
+
+  <div *ngIf="loadingEmpresas()" class="card empty-state">
+    Cargando empresas...
+  </div>
+
+  <div *ngIf="loading()" class="card empty-state">
+    Cargando dashboard...
+  </div>
+
+  <ng-container *ngIf="!loading() && dashboard() as d">
+    <section class="cards-grid">
+      <article class="metric-card">
+        <span class="metric-label">Total evaluaciones</span>
+        <strong class="metric-value">{{ d.resumen.totalEvaluaciones }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Finalizadas</span>
+        <strong class="metric-value">{{ d.resumen.totalFinalizadas }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">En elaboración</span>
+        <strong class="metric-value">{{ d.resumen.totalEnElaboracion }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Promedio general</span>
+        <strong class="metric-value">{{ d.resumen.promedioGeneral ?? '-' }}</strong>
+      </article>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h3>Resumen por empresa</h3>
+      </div>
+
+      <div *ngIf="d.resumenPorEmpresa.length === 0" class="empty-state">
+        No hay información por empresa.
+      </div>
+
+      <table *ngIf="d.resumenPorEmpresa.length > 0">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Total</th>
+            <th>Finalizadas</th>
+            <th>En elaboración</th>
+            <th>Promedio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let emp of d.resumenPorEmpresa">
+            <td>{{ emp.empresa }}</td>
+            <td>{{ emp.totalEvaluaciones }}</td>
+            <td>{{ emp.totalFinalizadas }}</td>
+            <td>{{ emp.totalEnElaboracion }}</td>
+            <td>{{ emp.promedioEmpresa ?? '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h3>Resumen por área</h3>
+      </div>
+
+      <div *ngIf="d.resumenPorArea.length === 0" class="empty-state">
+        No hay información por área.
+      </div>
+
+      <table *ngIf="d.resumenPorArea.length > 0">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Área</th>
+            <th>Total</th>
+            <th>Finalizadas</th>
+            <th>En elaboración</th>
+            <th>Promedio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let area of d.resumenPorArea">
+            <td>{{ area.empresa ?? '-' }}</td>
+            <td>{{ area.area }}</td>
+            <td>{{ area.totalEvaluaciones }}</td>
+            <td>{{ area.totalFinalizadas }}</td>
+            <td>{{ area.totalEnElaboracion }}</td>
+            <td>{{ area.promedioArea ?? '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="section-header">
+        <h3>Últimas evaluaciones</h3>
+        <a routerLink="/evaluaciones/listado">Ver listado completo</a>
+      </div>
+
+      <div *ngIf="d.ultimasEvaluaciones.length === 0" class="empty-state">
+        No hay evaluaciones recientes.
+      </div>
+
+      <table *ngIf="d.ultimasEvaluaciones.length > 0">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Empresa</th>
+            <th>Empleado</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Estado</th>
+            <th>Calificación</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of d.ultimasEvaluaciones">
+            <td>{{ e.fechaEvaluacion | date:'dd/MM/yyyy' }}</td>
+            <td>{{ e.empresa ?? '-' }}</td>
+            <td>{{ e.nombresEmpleado }} {{ e.apellidosEmpleado }}</td>
+            <td>{{ e.area }}</td>
+            <td>{{ e.cargo }}</td>
+            <td>{{ e.estado }}</td>
+            <td>{{ e.calificacionTotal ?? '-' }}</td>
+            <td>
+              <a [routerLink]="['/evaluaciones/detalle', e.idEvaluacion]">Ver detalle</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </ng-container>
+</div>

@@ -1,0 +1,14 @@
+# Archivos de compilación y binarios
+[Bb]in/
+[Oo]bj/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Archivos de configuración con datos sensibles
+appsettings.Development.json

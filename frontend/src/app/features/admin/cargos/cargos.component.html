@@ -1,0 +1,153 @@
+<div class="cargos-page">
+  <div class="header">
+    <h2>Cargos</h2>
+    <p>Administra los cargos por área.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>{{ title() }}</h3>
+
+      <div class="field">
+        <label for="idEmpresa">Empresa</label>
+        <select
+          id="idEmpresa"
+          [value]="selectedEmpresaId() ?? ''"
+          (change)="onEmpresaChange($any($event.target).value)">
+          <option value="">Seleccione...</option>
+          <option *ngFor="let empresa of empresas()" [value]="empresa.idEmpresa">
+            {{ empresa.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label for="idArea">Área</label>
+          <select id="idArea" formControlName="idArea" (change)="onAreaChange()">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let area of areas()" [ngValue]="area.idArea">
+              {{ area.nombre }}
+            </option>
+          </select>
+          <small *ngIf="form.controls.idArea.touched && form.controls.idArea.invalid">
+            El área es obligatoria.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" formControlName="nombre" />
+          <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <div class="field" *ngIf="isEditing()">
+          <label for="codigo">Código</label>
+          <input
+            id="codigo"
+            type="text"
+            [value]="editingCargo()?.codigo || ''"
+            readonly />
+        </div>
+
+        <div class="field checkbox-field" *ngIf="isEditing()">
+          <label>
+            <input type="checkbox" formControlName="activo" />
+            Cargo activo
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="saving() || !selectedEmpresaId()">
+            {{ saving() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+          </button>
+
+          <button
+            type="button"
+            class="secondary"
+            *ngIf="isEditing()"
+            (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+
+      <div class="message error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="list-header">
+        <h3>Listado</h3>
+        <button
+          type="button"
+          class="secondary"
+          (click)="selectedAreaId() && cargarCargos(selectedAreaId()!)"
+          [disabled]="loadingCargos() || !selectedAreaId() || !selectedEmpresaId()">
+          Recargar
+        </button>
+      </div>
+
+      <div *ngIf="loadingEmpresas()" class="empty-state">Cargando empresas...</div>
+      <div *ngIf="loadingAreas()" class="empty-state">Cargando áreas...</div>
+
+      <div *ngIf="!loadingEmpresas() && !selectedEmpresaId()" class="empty-state">
+        Selecciona una empresa para continuar.
+      </div>
+
+      <div *ngIf="!loadingAreas() && selectedEmpresaId() && !selectedAreaId()" class="empty-state">
+        Selecciona un área para ver sus cargos.
+      </div>
+
+      <div *ngIf="loadingCargos()" class="empty-state">Cargando cargos...</div>
+
+      <div *ngIf="!loadingCargos() && selectedAreaId() && cargos().length === 0" class="empty-state">
+        No hay cargos registrados para el área seleccionada.
+      </div>
+
+      <table *ngIf="!loadingCargos() && cargos().length > 0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Código</th>
+            <th>Activo</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cargo of cargos()">
+            <td>{{ cargo.nombre }}</td>
+            <td>{{ cargo.codigo || '-' }}</td>
+            <td>{{ cargo.activo ? 'Sí' : 'No' }}</td>
+            <td class="actions-col">
+              <button type="button" class="small" (click)="editar(cargo)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="small"
+                [class.warning]="cargo.activo"
+                [class.success]="!cargo.activo"
+                (click)="cambiarEstado(cargo)"
+                [disabled]="changingStateId() === cargo.idCargo">
+                {{
+                  changingStateId() === cargo.idCargo
+                    ? 'Procesando...'
+                    : (cargo.activo ? 'Inactivar' : 'Activar')
+                }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

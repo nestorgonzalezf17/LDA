@@ -1,0 +1,160 @@
+<div class="empresas-page">
+  <div class="header">
+    <h2>Empresas</h2>
+    <p>Administra las empresas del sistema, incluyendo su logo y estado.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>{{ title() }}</h3>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" formControlName="nombre" />
+          <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="logoFile">Logo de empresa</label>
+
+          <div class="logo-upload-row">
+            <label class="upload-file-btn" for="logoFile">
+              Seleccionar archivo
+            </label>
+
+            <input
+            #logoFileInput
+            id="logoFile"
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+            (change)="onLogoSelected($event)" />
+          </div>
+
+          <small *ngIf="selectedLogoFileName()">
+            Archivo seleccionado: {{ selectedLogoFileName() }}
+          </small>
+
+          <div class="upload-actions">
+            <button
+              type="button"
+              class="upload-logo-btn"
+              (click)="subirLogo()"
+              [disabled]="uploadingLogo() || !selectedLogoFile()">
+              {{ uploadingLogo() ? 'Subiendo logo...' : 'Subir logo' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="logoUrl">URL del logo</label>
+          <input id="logoUrl" type="text" formControlName="logoUrl" readonly />
+          <small>
+            Esta URL se genera automáticamente al subir el archivo.
+          </small>
+        </div>
+
+        <div class="logo-preview" *ngIf="resolverLogoUrl(form.value.logoUrl) as logoUrl">
+          <span>Vista previa</span>
+          <img [src]="logoUrl" />
+        </div>
+
+        <div class="field checkbox-field" *ngIf="isEditing()">
+          <label>
+            <input type="checkbox" formControlName="activo" />
+            Empresa activa
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="saving() || uploadingLogo()">
+            {{ saving() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+          </button>
+
+          <button
+            type="button"
+            class="secondary"
+            *ngIf="isEditing()"
+            (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+
+      <div class="message error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="list-header">
+        <h3>Listado</h3>
+        <button type="button" class="secondary" (click)="cargarEmpresas()" [disabled]="loading()">
+          Recargar
+        </button>
+      </div>
+
+      <div *ngIf="loading()" class="empty-state">Cargando empresas...</div>
+
+      <div *ngIf="!loading() && empresas().length === 0" class="empty-state">
+        No hay empresas registradas.
+      </div>
+
+      <table *ngIf="!loading() && empresas().length > 0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Código</th>
+            <th>Logo</th>
+            <th>Activo</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let empresa of empresas()">
+            <td>{{ empresa.nombre }}</td>
+            <td>{{ empresa.codigo || '-' }}</td>
+            <td>
+              <ng-container *ngIf="resolverLogoUrl(empresa.logoUrl) as logoUrl; else sinLogo">
+                <img
+                  [src]="logoUrl"
+                  alt="Logo"
+                  class="logo-img" />
+              </ng-container>
+
+              <ng-template #sinLogo>
+                <span>-</span>
+              </ng-template>
+            </td>
+            <td>{{ empresa.activo ? 'Sí' : 'No' }}</td>
+            <td class="actions-col">
+              <button type="button" class="small" (click)="editar(empresa)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="small"
+                [class.warning]="empresa.activo"
+                [class.success]="!empresa.activo"
+                (click)="cambiarEstado(empresa)"
+                [disabled]="changingStateId() === empresa.idEmpresa">
+                {{
+                  changingStateId() === empresa.idEmpresa
+                    ? 'Procesando...'
+                    : (empresa.activo ? 'Inactivar' : 'Activar')
+                }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

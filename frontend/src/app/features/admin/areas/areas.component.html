@@ -1,0 +1,133 @@
+<div class="areas-page">
+  <div class="header">
+    <h2>Áreas</h2>
+    <p>Administra las áreas disponibles para las evaluaciones.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>{{ title() }}</h3>
+
+      <div class="field">
+        <label for="idEmpresa">Empresa</label>
+        <select
+          id="idEmpresa"
+          [value]="selectedEmpresaId() ?? ''"
+          (change)="onEmpresaChange($any($event.target).value)">
+          <option value="">Seleccione...</option>
+          <option *ngFor="let empresa of empresas()" [value]="empresa.idEmpresa">
+            {{ empresa.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" formControlName="nombre" />
+          <small *ngIf="form.controls.nombre.touched && form.controls.nombre.invalid">
+            El nombre es obligatorio.
+          </small>
+        </div>
+
+        <div class="field" *ngIf="isEditing()">
+          <label for="codigo">Código</label>
+          <input
+            id="codigo"
+            type="text"
+            [value]="editingArea()?.codigo || ''"
+            readonly />
+        </div>
+
+        <div class="field checkbox-field" *ngIf="isEditing()">
+          <label>
+            <input type="checkbox" formControlName="activo" />
+            Área activa
+          </label>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="saving() || !selectedEmpresaId()">
+            {{ saving() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+          </button>
+
+          <button
+            type="button"
+            class="secondary"
+            *ngIf="isEditing()"
+            (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+
+      <div class="message error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="list-header">
+        <h3>Listado</h3>
+        <button type="button" class="secondary" (click)="cargarAreas()" [disabled]="loading() || !selectedEmpresaId()">
+          Recargar
+        </button>
+      </div>
+
+      <div *ngIf="loadingEmpresas()" class="empty-state">Cargando empresas...</div>
+
+      <div *ngIf="!loadingEmpresas() && !selectedEmpresaId()" class="empty-state">
+        Selecciona una empresa para ver sus áreas.
+      </div>
+
+      <div *ngIf="loading()" class="empty-state">Cargando áreas...</div>
+
+      <div *ngIf="!loading() && selectedEmpresaId() && areas().length === 0" class="empty-state">
+        No hay áreas registradas.
+      </div>
+
+      <table *ngIf="!loading() && areas().length > 0">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Nombre</th>
+            <th>Código</th>
+            <th>Activo</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let area of areas()">
+            <td>{{ area.empresa }}</td>
+            <td>{{ area.nombre }}</td>
+            <td>{{ area.codigo || '-' }}</td>
+            <td>{{ area.activo ? 'Sí' : 'No' }}</td>
+            <td class="actions-col">
+              <button type="button" class="small" (click)="editar(area)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="small"
+                [class.warning]="area.activo"
+                [class.success]="!area.activo"
+                (click)="cambiarEstado(area)"
+                [disabled]="changingStateId() === area.idArea">
+                {{
+                  changingStateId() === area.idArea
+                    ? 'Procesando...'
+                    : (area.activo ? 'Inactivar' : 'Activar')
+                }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

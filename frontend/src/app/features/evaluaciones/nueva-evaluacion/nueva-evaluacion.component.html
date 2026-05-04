@@ -1,0 +1,289 @@
+<div class="evaluacion-page">
+  <div class="toast-container">
+    <div class="toast success" *ngIf="successMessage()">
+      <span>{{ successMessage() }}</span>
+      <button type="button" class="toast-close" (click)="successMessage.set('')">
+        ×
+      </button>
+    </div>
+
+    <div class="toast error" *ngIf="errorMessage()">
+      <span>{{ errorMessage() }}</span>
+      <button type="button" class="toast-close" (click)="errorMessage.set('')">
+        ×
+      </button>
+    </div>
+  </div>
+
+  <div class="header">
+    <h2>Nueva evaluación</h2>
+    <p>Selecciona empresa, área, cargo y valida la cédula del empleado para iniciar.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>Datos de evaluación</h3>
+
+      <form [formGroup]="form" (ngSubmit)="crearEvaluacion()">
+        <div class="field">
+          <label for="idEmpresa">Empresa</label>
+          <select id="idEmpresa" formControlName="idEmpresa" (change)="onEmpresaChange()">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let empresa of empresas()" [ngValue]="empresa.idEmpresa">
+              {{ empresa.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="idArea">Área</label>
+          <select id="idArea" formControlName="idArea" (change)="onAreaChange()">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let area of areas()" [ngValue]="area.idArea">
+              {{ area.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="idCargo">Cargo</label>
+          <select id="idCargo" formControlName="idCargo" (change)="onCargoChange()">
+            <option [ngValue]="null">Seleccione...</option>
+            <option *ngFor="let cargo of cargos()" [ngValue]="cargo.idCargo">
+              {{ cargo.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="cedulaEmpleado">Cédula</label>
+
+          <div class="cedula-search">
+            <input
+              id="cedulaEmpleado"
+              type="text"
+              formControlName="cedulaEmpleado"
+              [placeholder]="editingId() ? 'Cédula bloqueada en edición' : 'Digite la cédula del empleado'"
+              [readonly]="!!editingId()"
+              (input)="onCedulaChange()" />
+
+            <button
+              type="button"
+              class="secondary buscar-empleado-btn"
+              (click)="buscarEmpleadoPorCedula()"
+              [disabled]="buscandoEmpleado() || saving() || finalizando() || !!editingId()">
+              {{ buscandoEmpleado() ? 'Buscando...' : 'Buscar' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="nombresEmpleado">Nombres</label>
+          <input
+            id="nombresEmpleado"
+            type="text"
+            formControlName="nombresEmpleado"
+            readonly
+            placeholder="Se cargan automáticamente desde nómina" />
+        </div>
+
+        <div class="field">
+          <label for="apellidosEmpleado">Apellidos</label>
+          <input
+            id="apellidosEmpleado"
+            type="text"
+            formControlName="apellidosEmpleado"
+            readonly
+            placeholder="Se cargan automáticamente desde nómina" />
+        </div>
+
+        <div class="field">
+          <label for="periodoEvaluado">Período de tiempo calificado</label>
+          <input id="periodoEvaluado" type="text" formControlName="periodoEvaluado" />
+        </div>
+
+        <div class="field">
+          <label for="observaciones">Observaciones</label>
+          <textarea id="observaciones" rows="3" formControlName="observaciones"></textarea>
+        </div>
+
+        <div class="actions">
+          <button
+            type="submit"
+            [disabled]="saving() || finalizando() || buscandoEmpleado()">
+            {{ saving() ? 'Guardando...' : (editingId() ? 'Actualizar cabecera' : 'Crear evaluación') }}
+          </button>
+        </div>
+      </form>
+
+      <div class="message info" *ngIf="editingId()">
+        Id evaluación: {{ editingId() }}
+      </div>
+    </section>
+
+    <section class="card plantilla-card">
+      <h3>Formato de evaluación</h3>
+
+      <div *ngIf="loadingPlantilla()" class="empty-state">
+        Cargando plantilla...
+      </div>
+
+      <div *ngIf="!loadingPlantilla() && !tienePlantilla()" class="empty-state">
+        La plantilla aparecerá aquí después de seleccionar empresa, área y cargo.
+      </div>
+
+      <div *ngIf="tienePlantilla() && plantilla() as p" class="formato-evaluacion">
+        <div class="encabezado" *ngIf="p.cabecera as c">
+          <div class="encabezado-top">
+            <div class="logo-box">
+              <ng-container *ngIf="c.logoEmpresa; else sinLogoTpl">
+                <img
+                  [src]="resolverLogoUrl(c.logoEmpresa)"
+                  alt="Logo empresa"
+                  class="logo-img" />
+              </ng-container>
+
+              <ng-template #sinLogoTpl>
+                <div class="logo-placeholder">
+                  <span>Logo no configurado</span>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="titulo-box">
+              <div class="titulo-superior">{{ c.tituloSistema }}</div>
+              <div class="titulo-principal">{{ c.tituloFormato }}</div>
+            </div>
+
+            <div class="meta-box">
+              <div class="meta-row">
+                <span class="meta-label">Código:</span>
+                <span class="meta-value">{{ c.codigoFormato }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Versión:</span>
+                <span class="meta-value">{{ c.versionFormato }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Fecha:</span>
+                <span class="meta-value">{{ c.fechaFormato }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="label">Nombre del evaluado:</div>
+              <div class="value">
+                {{ (form.value.nombresEmpleado || '') + ' ' + (form.value.apellidosEmpleado || '') }}
+              </div>
+
+              <div class="label">Empresa:</div>
+              <div class="value">{{ c.empresa }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Área o dependencia:</div>
+              <div class="value">{{ c.areaODependencia }}</div>
+
+              <div class="label">Cargo evaluado:</div>
+              <div class="value">{{ c.cargoEvaluado }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Período de tiempo calificado:</div>
+              <div class="value">{{ form.value.periodoEvaluado || c.periodoTiempoCalificado }}</div>
+
+              <div class="label">Fecha:</div>
+              <div class="value">{{ c.fecha }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Jefe inmediato del evaluador:</div>
+              <div class="value">{{ c.jefeInmediatoEvaluador }}</div>
+
+              <div class="label">Estado:</div>
+              <div class="value">{{ editingId() ? 'BORRADOR' : 'SIN GENERAR' }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Cédula:</div>
+              <div class="value">{{ form.value.cedulaEmpleado || '-' }}</div>
+
+              <div class="label">Id evaluación:</div>
+              <div class="value">{{ editingId() || '-' }}</div>
+            </div>
+          </div>
+
+          <div class="intro">
+            La siguiente evaluación está organizada por dimensiones, competencias e ítems.
+            Califique cada uno de los criterios según la escala definida para esta evaluación.
+          </div>
+        </div>
+
+        <div class="plantilla-body">
+          <div class="escala-block">
+            <h4>Escala de calificación</h4>
+            <div class="escala-grid">
+              <div class="escala-item" *ngFor="let e of p.escala">
+                <strong>{{ e.valor }}</strong> - {{ e.nombre }}
+              </div>
+            </div>
+          </div>
+
+          <div *ngFor="let seccion of p.secciones; let sIndex = index" class="seccion-block">
+            <h4 class="seccion-title">{{ seccion.seccion }}</h4>
+
+            <div *ngFor="let competencia of seccion.competencias; let cIndex = index" class="competencia-block">
+              <h5 class="competencia-title">{{ competencia.competencia }}</h5>
+
+              <div *ngFor="let item of competencia.items; let iIndex = index" class="item-evaluable">
+                <div class="item-texto">
+                  {{ item.textoItem }}
+                </div>
+
+                <div class="item-calificaciones">
+                  <label class="opcion-calificacion" *ngFor="let escala of p.escala">
+                    <input
+                      type="radio"
+                      [name]="'calificacion-item-' + item.tipoItem + '-' + item.idItem"
+                      [value]="escala.valor"
+                      [checked]="item.calificacion === escala.valor"
+                      (change)="item.calificacion = escala.valor" />
+                    <span>{{ escala.valor }}</span>
+                  </label>
+                </div>
+
+                <div class="item-comentario">
+                  <textarea
+                    rows="2"
+                    placeholder="Comentario opcional"
+                    [value]="item.comentario || ''"
+                    (input)="item.comentario = $any($event.target).value">
+                  </textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions footer-actions">
+            <button
+              type="button"
+              class="secondary"
+              (click)="guardarBorrador()"
+              [disabled]="saving() || finalizando() || !editingId()">
+              {{ saving() ? 'Guardando...' : 'Guardar respuestas' }}
+            </button>
+
+            <button
+              type="button"
+              (click)="finalizarEvaluacion()"
+              [disabled]="saving() || finalizando() || !editingId() || !puedeFinalizar()">
+              {{ finalizando() ? 'Procesando...' : 'Guardar y finalizar evaluación' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

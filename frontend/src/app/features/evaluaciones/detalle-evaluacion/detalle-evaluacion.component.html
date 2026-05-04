@@ -1,0 +1,143 @@
+<div class="detalle-page">
+  <div class="header no-print">
+    <div>
+      <h2>Detalle de evaluación</h2>
+      <p>Consulta la información completa y las respuestas registradas.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" (click)="imprimir()">Imprimir / Guardar PDF</button>
+      <a routerLink="/evaluaciones/listado" class="back-link">Volver al listado</a>
+    </div>
+  </div>
+
+  <div class="message error no-print" *ngIf="errorMessage()">
+    {{ errorMessage() }}
+  </div>
+
+  <div *ngIf="loading()" class="card empty-state no-print">
+    Cargando detalle...
+  </div>
+
+  <ng-container *ngIf="!loading() && detalle() as d">
+    <div class="pdf-export-area print-root">
+      <section class="card formato-card pdf-block" *ngIf="d.cabecera as c">
+        <div class="encabezado">
+          <div class="encabezado-top">
+            <div class="logo-box">
+              <ng-container *ngIf="resolverLogoUrl(c.logoEmpresa) as logoUrl; else sinLogoTpl">
+                <img
+                  [src]="logoUrl"
+                  alt="Logo empresa"
+                  class="logo-img" />
+              </ng-container>
+
+              <ng-template #sinLogoTpl>
+                <div class="logo-placeholder">
+                  <span>Logo no configurado</span>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="titulo-box">
+              <div class="titulo-superior">{{ c.tituloSistema }}</div>
+              <div class="titulo-principal">{{ c.tituloFormato }}</div>
+            </div>
+
+            <div class="meta-box">
+              <div class="meta-row">
+                <span class="meta-label">Código:</span>
+                <span class="meta-value">{{ c.codigoFormato }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Versión:</span>
+                <span class="meta-value">{{ c.versionFormato }}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-label">Fecha:</span>
+                <span class="meta-value">{{ c.fechaFormato }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="label">Nombre del evaluado:</div>
+              <div class="value">{{ c.nombresEmpleado }} {{ c.apellidosEmpleado }}</div>
+
+              <div class="label">Empresa:</div>
+              <div class="value">{{ c.empresa }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Área o dependencia:</div>
+              <div class="value">{{ c.areaODependencia }}</div>
+
+              <div class="label">Cargo evaluado:</div>
+              <div class="value">{{ c.cargoEvaluado }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Período de tiempo calificado:</div>
+              <div class="value">{{ c.periodoEvaluado }}</div>
+
+              <div class="label">Fecha:</div>
+              <div class="value">{{ c.fecha }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Jefe inmediato del evaluador:</div>
+              <div class="value">{{ c.jefeInmediatoEvaluador }}</div>
+
+              <div class="label">Estado:</div>
+              <div class="value">{{ c.estado }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Cédula:</div>
+              <div class="value">{{ c.cedulaEmpleado }}</div>
+
+              <div class="label">Calificación total:</div>
+              <div class="value">{{ c.calificacionTotal ?? '-' }}</div>
+            </div>
+
+            <div class="info-row">
+              <div class="label">Fecha finalización:</div>
+              <div class="value">
+                {{ c.fechaFinalizacion ? (c.fechaFinalizacion | date:'dd/MM/yyyy HH:mm') : '-' }}
+              </div>
+
+              <div class="label">Id evaluación:</div>
+              <div class="value">{{ c.idEvaluacion }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card respuestas-card" *ngIf="respuestasAgrupadas().length > 0">
+        <ng-container *ngFor="let seccion of respuestasAgrupadas()">
+          <div class="seccion-title-block pdf-block">
+            <h4 class="seccion-title">{{ seccion.seccion }}</h4>
+          </div>
+
+          <div *ngFor="let competencia of seccion.competencias" class="competencia-block pdf-block">
+            <h5 class="competencia-title">{{ competencia.competencia }}</h5>
+
+            <div *ngFor="let item of competencia.items" class="item-block">
+              <div class="item-texto">{{ item.textoItem }}</div>
+
+              <div class="item-meta">
+                <span><strong>Calificación:</strong> {{ item.calificacion }}</span>
+                <span><strong>Comentario:</strong> {{ item.comentario || '-' }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </section>
+
+      <section class="card empty-state" *ngIf="respuestasAgrupadas().length === 0">
+        No hay respuestas registradas para esta evaluación.
+      </section>
+    </div>
+  </ng-container>
+</div>

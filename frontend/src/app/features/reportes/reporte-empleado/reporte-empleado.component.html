@@ -1,0 +1,138 @@
+<div class="reporte-page">
+  <div class="header">
+    <div>
+      <h2>Reporte por empleado</h2>
+      <p>Busca un empleado por cédula o nombre y selecciona la coincidencia correcta.</p>
+    </div>
+
+    <a routerLink="/" class="back-link">Volver al inicio</a>
+  </div>
+
+  <section class="card">
+    <form [formGroup]="form" class="busqueda-form" autocomplete="off">
+      <div class="field">
+        <label for="idEmpresa">Empresa</label>
+        <select id="idEmpresa" [formControl]="form.controls.idEmpresa" (change)="onEmpresaChange()">
+          <option [ngValue]="null">Todas</option>
+          <option *ngFor="let empresa of empresas()" [ngValue]="empresa.idEmpresa">
+            {{ empresa.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="busqueda">Búsqueda</label>
+        <input
+          id="busqueda"
+          type="text"
+          formControlName="busqueda"
+          (input)="onBusquedaInput()"
+          placeholder="Cédula, nombres o apellidos" />
+      </div>
+
+      <div class="coincidencias" *ngIf="coincidencias().length > 0">
+        <button
+          type="button"
+          class="coincidencia-item"
+          *ngFor="let item of coincidencias()"
+          (click)="seleccionarEmpleado(item)">
+          {{ item.nombresEmpleado }} {{ item.apellidosEmpleado }} - {{ item.cedulaEmpleado }}
+        </button>
+      </div>
+
+      <div class="actions" *ngIf="resultado()?.evaluaciones?.length">
+        <button
+          type="button"
+          class="success"
+          (click)="exportarExcel()"
+          [disabled]="exporting()">
+          {{ exporting() ? 'Exportando...' : 'Exportar Excel' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="message error" *ngIf="errorMessage()">
+      {{ errorMessage() }}
+    </div>
+  </section>
+
+  <div *ngIf="loadingEmpresas()" class="card empty-state">
+    Cargando empresas...
+  </div>
+
+  <div *ngIf="buscando()" class="card empty-state">
+    Buscando coincidencias...
+  </div>
+
+  <div *ngIf="loading()" class="card empty-state">
+    Cargando reporte...
+  </div>
+
+  <ng-container *ngIf="!loading() && resultado() as r">
+    <section class="cards-grid" *ngIf="r.resumen">
+      <article class="metric-card">
+        <span class="metric-label">Empleado</span>
+        <strong class="metric-value small">
+          {{ r.resumen.nombresEmpleado }} {{ r.resumen.apellidosEmpleado }}
+        </strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Cédula</span>
+        <strong class="metric-value small">{{ r.resumen.cedulaEmpleado }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Total evaluaciones</span>
+        <strong class="metric-value">{{ r.resumen.totalEvaluaciones }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Promedio finalizadas</span>
+        <strong class="metric-value">{{ r.resumen.promedioCalificacion ?? '-' }}</strong>
+      </article>
+    </section>
+
+    <section class="card">
+      <h3>Histórico de evaluaciones</h3>
+
+      <div *ngIf="r.evaluaciones.length === 0" class="empty-state">
+        No se encontraron evaluaciones para el empleado seleccionado.
+      </div>
+      
+
+      <table *ngIf="r.evaluaciones.length > 0">
+  <thead>
+    <tr>
+      <th>Fecha</th>
+      <th>Empresa</th>
+      <th>Cédula</th>
+      <th>Evaluado</th>
+      <th>Estado</th>
+      <th>Área</th>
+      <th>Cargo</th>
+      <th>Evaluador</th>
+      <th>Calificación total</th>
+      <th>Acción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let e of r.evaluaciones">
+      <td>{{ e.fechaEvaluacion | date:'dd/MM/yyyy' }}</td>
+      <td>{{ e.empresa ?? '-' }}</td>
+      <td>{{ e.cedulaEmpleado ?? '-' }}</td>
+      <td>{{ (e.nombresEmpleado ?? '') + ' ' + (e.apellidosEmpleado ?? '') }}</td>
+      <td>{{ e.estado }}</td>
+      <td>{{ e.area }}</td>
+      <td>{{ e.cargo }}</td>
+      <td>{{ e.evaluador }}</td>
+      <td>{{ e.calificacionTotal ?? '-' }}</td>
+      <td>
+        <a [routerLink]="['/evaluaciones/detalle', e.idEvaluacion]">Ver detalle</a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+    </section>
+  </ng-container>
+</div>

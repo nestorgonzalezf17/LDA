@@ -1,0 +1,101 @@
+<div class="reporte-page">
+  <div class="header">
+    <div>
+      <h2>Reporte por área</h2>
+      <p>Consulta el comportamiento general de las evaluaciones agrupadas por área.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" (click)="cargar()" [disabled]="loading()">
+        {{ loading() ? 'Actualizando...' : 'Actualizar' }}
+      </button>
+
+      <button
+        type="button"
+        class="success"
+        (click)="exportarExcel()"
+        [disabled]="exporting() || loading() || data().length === 0">
+        {{ exporting() ? 'Exportando...' : 'Exportar Excel' }}
+      </button>
+    </div>
+  </div>
+
+  <section class="card filtros-card">
+    <div class="field">
+      <label for="idEmpresa">Empresa</label>
+      <select id="idEmpresa" [formControl]="form.controls.idEmpresa" (change)="onEmpresaChange()">
+        <option [ngValue]="null">Todas</option>
+        <option *ngFor="let empresa of empresas()" [ngValue]="empresa.idEmpresa">
+          {{ empresa.nombre }}
+        </option>
+      </select>
+    </div>
+  </section>
+
+  <div class="message error" *ngIf="errorMessage()">
+    {{ errorMessage() }}
+  </div>
+
+  <div *ngIf="loadingEmpresas()" class="card empty-state">
+    Cargando empresas...
+  </div>
+
+  <div *ngIf="loading()" class="card empty-state">
+    Cargando reporte...
+  </div>
+
+  <ng-container *ngIf="!loading()">
+    <section class="cards-grid">
+      <article class="metric-card">
+        <span class="metric-label">Áreas</span>
+        <strong class="metric-value">{{ resumen().totalAreas }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Total evaluaciones</span>
+        <strong class="metric-value">{{ resumen().totalEvaluaciones }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Finalizadas</span>
+        <strong class="metric-value">{{ resumen().totalFinalizadas }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Promedio general</span>
+        <strong class="metric-value">{{ resumen().promedioGeneral ?? '-' }}</strong>
+      </article>
+    </section>
+
+    <section class="card">
+      <h3>Detalle por área</h3>
+
+      <div *ngIf="data().length === 0" class="empty-state">
+        No hay información disponible.
+      </div>
+
+      <table *ngIf="data().length > 0">
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Área</th>
+            <th>Total evaluaciones</th>
+            <th>Finalizadas</th>
+            <th>En elaboración</th>
+            <th>Promedio calificación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of data()">
+            <td>{{ row.empresa ?? '-' }}</td>
+            <td>{{ row.area }}</td>
+            <td>{{ row.totalEvaluaciones }}</td>
+            <td>{{ row.totalFinalizadas }}</td>
+            <td>{{ row.totalEnElaboracion }}</td>
+            <td>{{ row.promedioCalificacion ?? '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </ng-container>
+</div>

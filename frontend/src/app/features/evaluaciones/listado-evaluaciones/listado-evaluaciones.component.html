@@ -1,0 +1,152 @@
+<div class="listado-page">
+  <div class="header">
+    <h2>Listado de evaluaciones</h2>
+    <p>Consulta las evaluaciones registradas y su calificación total.</p>
+  </div>
+
+  <section class="card filtros-card">
+    <h3>Filtros</h3>
+
+    <form [formGroup]="filtrosForm">
+      <div class="filtros-grid">
+        <div class="field">
+          <label for="idEmpresa">Empresa</label>
+          <select id="idEmpresa" formControlName="idEmpresa" (change)="onEmpresaChange()">
+            <option [ngValue]="null">Todas</option>
+            <option *ngFor="let empresa of empresas()" [ngValue]="empresa.idEmpresa">
+              {{ empresa.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="idArea">Área</label>
+          <select id="idArea" formControlName="idArea" (change)="onAreaChange()">
+            <option [ngValue]="null">Todas</option>
+            <option *ngFor="let area of areas()" [ngValue]="area.idArea">
+              {{ area.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="idCargo">Cargo</label>
+          <select id="idCargo" formControlName="idCargo">
+            <option [ngValue]="null">Todos</option>
+            <option *ngFor="let cargo of cargos()" [ngValue]="cargo.idCargo">
+              {{ cargo.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="cedulaEmpleado">Cédula</label>
+          <input id="cedulaEmpleado" type="text" formControlName="cedulaEmpleado" />
+        </div>
+
+        <div class="field">
+          <label for="fechaDesde">Fecha desde</label>
+          <input id="fechaDesde" type="date" formControlName="fechaDesde" />
+        </div>
+
+        <div class="field">
+          <label for="fechaHasta">Fecha hasta</label>
+          <input id="fechaHasta" type="date" formControlName="fechaHasta" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="buscar()" [disabled]="loadingEvaluaciones()">
+          {{ loadingEvaluaciones() ? 'Buscando...' : 'Buscar' }}
+        </button>
+
+        <button type="button" class="secondary" (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </form>
+
+    <div class="message error" *ngIf="errorMessage()">
+      {{ errorMessage() }}
+    </div>
+
+    <div class="message success" *ngIf="successMessage()">
+      {{ successMessage() }}
+    </div>
+  </section>
+
+  <section class="card tabla-card">
+    <h3>Resultados</h3>
+
+    <div *ngIf="loadingEmpresas()" class="empty-state">
+      Cargando empresas...
+    </div>
+
+    <div *ngIf="loadingEvaluaciones()" class="empty-state">
+      Cargando evaluaciones...
+    </div>
+
+    <div *ngIf="!loadingEvaluaciones() && evaluaciones().length === 0" class="empty-state">
+      No se encontraron evaluaciones.
+    </div>
+
+    <table *ngIf="!loadingEvaluaciones() && evaluaciones().length > 0">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Empresa</th>
+          <th>Empleado</th>
+          <th>Cédula</th>
+          <th>Período</th>
+          <th>Área</th>
+          <th>Cargo</th>
+          <th>Evaluador</th>
+          <th>Estado</th>
+          <th>Calificación total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of evaluaciones()">
+          <td>{{ e.fechaEvaluacion | date:'dd/MM/yyyy' }}</td>
+          <td>{{ e.empresa }}</td>
+          <td>{{ e.nombresEmpleado }} {{ e.apellidosEmpleado }}</td>
+          <td>{{ e.cedulaEmpleado }}</td>
+          <td>{{ e.periodoEvaluado }}</td>
+          <td>{{ e.area }}</td>
+          <td>{{ e.cargo }}</td>
+          <td>{{ e.evaluador }}</td>
+          <td>{{ e.estado }}</td>
+          <td>{{ e.calificacionTotal ?? '-' }}</td>
+          <td class="acciones-col">
+            <ng-container *ngIf="e.estado === 'BORRADOR'; else accionesFinalizadas">
+              <button
+                type="button"
+                class="link-btn"
+                (click)="continuar(e.idEvaluacion)">
+                Continuar
+              </button>
+
+              <button
+                type="button"
+                class="link-btn danger"
+                (click)="eliminarBorrador(e.idEvaluacion)"
+                [disabled]="deletingId() === e.idEvaluacion">
+                {{ deletingId() === e.idEvaluacion ? 'Eliminando...' : 'Eliminar' }}
+              </button>
+            </ng-container>
+
+            <ng-template #accionesFinalizadas>
+              <button
+                type="button"
+                class="link-btn"
+                (click)="verDetalle(e.idEvaluacion)">
+                Ver detalle
+              </button>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

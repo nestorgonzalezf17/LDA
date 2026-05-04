@@ -1,0 +1,48 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <h2>Sistema de Evaluación de Desempeño</h2>
+
+      <nav>
+        <a routerLink="/inicio" routerLinkActive="active">Inicio</a>
+
+        <ng-container *ngIf="hasRole(['ADMIN'])">
+          <a routerLink="/admin/empresas" routerLinkActive="active">Empresas</a>
+          <a routerLink="/admin/areas" routerLinkActive="active">Áreas</a>
+          <a routerLink="/admin/cargos" routerLinkActive="active">Cargos</a>
+          <a routerLink="/admin/usuarios-modulo" routerLinkActive="active">Administración de Usuarios</a>
+          <a routerLink="/admin/items-cargo" routerLinkActive="active">Ítems por cargo</a>
+          <a routerLink="/admin/carga-masiva" routerLinkActive="active">Carga masiva</a>
+        </ng-container>
+
+        <ng-container *ngIf="hasRole(['ADMIN', 'EVALUADOR'])">
+          <a routerLink="/evaluaciones/nueva" routerLinkActive="active">Nueva evaluación</a>
+          <a routerLink="/evaluaciones/listado" routerLinkActive="active">Listado de evaluaciones</a>
+          <a *ngIf="hasRole(['ADMIN'])" routerLink="/reportes/areas" routerLinkActive="active">
+            Reporte por área
+          </a>
+          <a *ngIf="hasRole(['ADMIN'])" routerLink="/reportes/empleados" routerLinkActive="active">
+            Reporte por empleado
+          </a>
+        </ng-container>
+      </nav>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <ng-container *ngIf="user$ | async as user">
+        <div class="topbar-user">
+          <div class="topbar-name">{{ user.nombreCompleto }}</div>
+          <div class="topbar-role">{{ user.rolModulo }}</div>
+        </div>
+      </ng-container>
+
+      <button class="logout-btn" type="button" (click)="logout()">Salir</button>
+    </header>
+
+    <section class="page">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

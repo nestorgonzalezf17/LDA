@@ -1,0 +1,81 @@
+<div class="auth-page">
+  <section class="auth-shell">
+    <aside class="auth-brand">
+      <div class="brand-badge">EDD</div>
+
+      <div class="brand-content">
+        <h1>Evaluación de Desempeño</h1>
+        <p>
+          Plataforma corporativa para la gestión, seguimiento y consulta de evaluaciones internas.
+        </p>
+      </div>
+
+      <div class="brand-footer">
+        <span>Sistema de Gestión Humana</span>
+      </div>
+    </aside>
+
+    <main class="auth-panel">
+      <form class="auth-card" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="auth-header">
+          <h2>Ingreso al sistema</h2>
+          <p>Utiliza tus credenciales corporativas para continuar.</p>
+        </div>
+
+        <div class="field">
+          <label for="login">Correo</label>
+          <input
+            id="login"
+            type="text"
+            formControlName="login"
+            placeholder="correo@empresa.com"
+            autocomplete="username"
+          />
+
+          <small *ngIf="form.controls.login.touched && form.controls.login.invalid">
+            El usuario es obligatorio.
+          </small>
+        </div>
+
+        <div class="field">
+          <label for="clave">Contraseña</label>
+
+          <div class="password-wrapper">
+            <input
+              id="clave"
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="clave"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password"
+            />
+
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              {{ showPassword ? 'Ocultar' : 'Ver' }}
+            </button>
+          </div>
+
+          <small *ngIf="form.controls.clave.touched && form.controls.clave.invalid">
+            La clave es obligatoria.
+          </small>
+        </div>
+
+        <div class="error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <button class="primary-button" type="submit" [disabled]="loading">
+          {{ loading ? 'Ingresando...' : 'Ingresar' }}
+        </button>
+
+        <p class="auth-note">
+          Si no tienes acceso, comunícate con el administrador del sistema.
+        </p>
+      </form>
+    </main>
+  </section>
+</div>

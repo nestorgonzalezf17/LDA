@@ -1,0 +1,14 @@
+Comandos para eliminar Ítems Cargo:
+
+DELETE FROM [EDD].[ItemsEvaluacionCargo]
+WHERE IdItemCargo IN (1, 2);
+
+Si ya tienen evaluaciones asociadas toca eliminar las evaluaciones primero:
+
+-- 1. Primero borras las respuestas asociadas a esos ítems
+DELETE FROM [EDD].[EvaluacionRespuestas]
+WHERE IdItemCargo IN (1, 2);
+
+-- 2. Ahora sí puedes borrar los ítems de la configuración
+DELETE FROM [EDD].[ItemsEvaluacionCargo]
+WHERE IdItemCargo IN (1, 2);

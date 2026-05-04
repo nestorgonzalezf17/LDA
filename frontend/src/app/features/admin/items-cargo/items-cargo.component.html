@@ -1,0 +1,142 @@
+<div class="items-page">
+  <div class="header">
+    <h2>Ítems por cargo</h2>
+    <p>Administra los ítems personalizados para la competencia Responsabilidad.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>{{ title() }}</h3>
+
+      <div class="field">
+        <label for="idEmpresa">Empresa</label>
+        <select
+          id="idEmpresa"
+          [value]="selectedEmpresaId() ?? ''"
+          (change)="onEmpresaChange($any($event.target).value)">
+          <option value="">Seleccione...</option>
+          <option *ngFor="let empresa of empresas()" [value]="empresa.idEmpresa">
+            {{ empresa.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="idArea">Área</label>
+        <select id="idArea" [formControl]="filtroForm.controls.idArea" (change)="onAreaChange()">
+          <option [ngValue]="null">Seleccione...</option>
+          <option *ngFor="let area of areas()" [ngValue]="area.idArea">
+            {{ area.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="idCargo">Cargo</label>
+        <select id="idCargo" [formControl]="filtroForm.controls.idCargo" (change)="onCargoChange()">
+          <option [ngValue]="null">Seleccione...</option>
+          <option *ngFor="let cargo of cargos()" [ngValue]="cargo.idCargo">
+            {{ cargo.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label for="textoItem">Descripción del ítem</label>
+          <textarea id="textoItem" rows="5" formControlName="textoItem"></textarea>
+          <small *ngIf="form.controls.textoItem.touched && form.controls.textoItem.invalid">
+            La descripción es obligatoria.
+          </small>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="saving() || !selectedEmpresaId() || !selectedCargoId()">
+            {{ saving() ? 'Guardando...' : (isEditing() ? 'Actualizar' : 'Crear') }}
+          </button>
+
+          <button type="button" class="secondary" *ngIf="isEditing()" (click)="cancelarEdicion()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+
+      <div class="message success" *ngIf="successMessage()">
+        {{ successMessage() }}
+      </div>
+
+      <div class="message error" *ngIf="errorMessage()">
+        {{ errorMessage() }}
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <div class="list-header">
+        <h3>Ítems personalizados</h3>
+        <button
+          type="button"
+          class="secondary"
+          (click)="selectedCargoId() && cargarItems(selectedCargoId()!)"
+          [disabled]="loadingItems() || !selectedCargoId() || !selectedEmpresaId()">
+          Recargar
+        </button>
+      </div>
+
+      <div *ngIf="loadingEmpresas()" class="empty-state">Cargando empresas...</div>
+      <div *ngIf="loadingAreas()" class="empty-state">Cargando áreas...</div>
+      <div *ngIf="loadingCargos()" class="empty-state">Cargando cargos...</div>
+      <div *ngIf="loadingItems()" class="empty-state">Cargando ítems...</div>
+
+      <div *ngIf="!loadingEmpresas() && !selectedEmpresaId()" class="empty-state">
+        Selecciona una empresa para continuar.
+      </div>
+
+      <div *ngIf="!loadingItems() && selectedEmpresaId() && !selectedCargoId()" class="empty-state">
+        Selecciona un cargo para administrar los ítems personalizados.
+      </div>
+
+      <div *ngIf="!loadingItems() && selectedCargoId() && items().length === 0" class="empty-state">
+        No hay ítems personalizados para este cargo.
+      </div>
+
+      <table *ngIf="!loadingItems() && items().length > 0">
+        <thead>
+          <tr>
+            <th>Competencia</th>
+            <th>Descripción</th>
+            <th>Orden</th>
+            <th>Activo</th>
+            <th class="actions-col">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items()">
+            <td>{{ item.competencia }}</td>
+            <td>{{ item.textoItem }}</td>
+            <td>{{ item.orden }}</td>
+            <td>{{ item.activo ? 'Sí' : 'No' }}</td>
+            <td class="actions-col">
+              <button type="button" class="small" (click)="editar(item)">
+                Editar
+              </button>
+
+              <button
+                type="button"
+                class="small"
+                [class.warning]="item.activo"
+                [class.success]="!item.activo"
+                (click)="cambiarEstado(item)"
+                [disabled]="deletingId() === item.idItemCargo">
+                {{
+                  deletingId() === item.idItemCargo
+                    ? 'Procesando...'
+                    : (item.activo ? 'Inactivar' : 'Activar')
+                }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</div>

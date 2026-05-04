@@ -1,0 +1,195 @@
+<div class="carga-masiva-page">
+  <div class="header">
+    <div>
+      <h2>Carga masiva</h2>
+      <p>
+        Importa empresas, áreas y cargos desde un archivo Excel.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="secondary"
+        (click)="descargarPlantilla()"
+        [disabled]="loadingPlantilla()">
+        {{ loadingPlantilla() ? 'Descargando...' : 'Descargar plantilla' }}
+      </button>
+    </div>
+  </div>
+
+  <section class="card info-card">
+    <h3>Instrucciones</h3>
+
+    <div class="instructions-grid">
+      <div>
+        <h4>Columnas obligatorias</h4>
+        <code>TipoRegistro, EmpresaNombre, AreaNombre, CargoNombre, Activo</code>
+      </div>
+
+      <div>
+        <h4>Valores válidos</h4>
+        <p><strong>TipoRegistro:</strong> EMPRESA, AREA, CARGO</p>
+        <p><strong>Activo:</strong> SI, NO</p>
+      </div>
+    </div>
+
+    <div class="example-block">
+      <h4>Ejemplo de diligenciamiento</h4>
+      <pre>TipoRegistro | EmpresaNombre | AreaNombre | CargoNombre | Activo
+EMPRESA      | ICEBERG       |            |             | SI
+AREA         | ICEBERG       | SISTEMAS   |             | SI
+CARGO        | ICEBERG       | SISTEMAS   | INGENIERO DE SOPORTE | SI
+EMPRESA      | FASTRACK      |            |             | SI
+AREA         | FASTRACK      | OPERACIONES|             | SI
+CARGO        | FASTRACK      | OPERACIONES| COORDINADOR OPERATIVO | SI</pre>
+    </div>
+
+    <div class="warning-box">
+      <strong>Importante:</strong>
+      Las empresas creadas por carga masiva quedarán sin logo.
+      El logo deberá cargarse posteriormente editando la empresa manualmente desde el módulo Empresas.
+    </div>
+  </section>
+
+  <section class="card upload-card">
+    <h3>Subir archivo</h3>
+
+    <div class="upload-row">
+      <label class="file-label">
+        <input
+          type="file"
+          accept=".xlsx"
+          (change)="onArchivoSeleccionado($event)" />
+        <span>Seleccionar archivo Excel</span>
+      </label>
+
+      <div class="file-name">{{ nombreArchivo() }}</div>
+    </div>
+
+    <div class="actions">
+      <button
+        type="button"
+        (click)="generarPreview()"
+        [disabled]="loadingPreview() || !archivoSeleccionado()">
+        {{ loadingPreview() ? 'Validando...' : 'Generar vista previa' }}
+      </button>
+
+      <button
+        type="button"
+        class="success"
+        (click)="importar()"
+        [disabled]="loadingImportar() || !preview() || (preview()?.filasConError ?? 0) > 0">
+        {{ loadingImportar() ? 'Importando...' : 'Importar' }}
+      </button>
+
+      <button
+        type="button"
+        class="secondary"
+        (click)="limpiar()">
+        Limpiar
+      </button>
+    </div>
+  </section>
+
+  <div class="message error" *ngIf="errorMessage()">
+    {{ errorMessage() }}
+  </div>
+
+  <div class="message success" *ngIf="successMessage()">
+    {{ successMessage() }}
+  </div>
+
+  <section class="card" *ngIf="preview() as p">
+    <div class="section-header">
+      <h3>Vista previa</h3>
+      <div class="summary-badges">
+        <span class="badge">Total: {{ p.totalFilas }}</span>
+        <span class="badge success">Válidas: {{ p.filasValidas }}</span>
+        <span class="badge error">Con error: {{ p.filasConError }}</span>
+      </div>
+    </div>
+
+    <div class="message warning" *ngIf="p.advertencias.length > 0">
+      <div *ngFor="let advertencia of p.advertencias">
+        {{ advertencia }}
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="p.filas.length === 0">
+      No se encontraron filas para procesar.
+    </div>
+
+    <div class="table-wrapper" *ngIf="p.filas.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th>Fila</th>
+            <th>Tipo</th>
+            <th>Empresa</th>
+            <th>Área</th>
+            <th>Cargo</th>
+            <th>Activo</th>
+            <th>Estado</th>
+            <th>Acción sugerida</th>
+            <th>Errores</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let fila of p.filas" [class.row-error]="!fila.esValida">
+            <td>{{ fila.numeroFila }}</td>
+            <td>{{ fila.tipoRegistro }}</td>
+            <td>{{ fila.empresaNombre || '-' }}</td>
+            <td>{{ fila.areaNombre || '-' }}</td>
+            <td>{{ fila.cargoNombre || '-' }}</td>
+            <td>{{ fila.activo ? 'SI' : 'NO' }}</td>
+            <td>
+              <span [class.ok]="fila.esValida" [class.invalid]="!fila.esValida">
+                {{ fila.esValida ? 'Válida' : 'Con error' }}
+              </span>
+            </td>
+            <td>{{ fila.accionSugerida || '-' }}</td>
+            <td>
+              <div *ngIf="fila.errores.length === 0">-</div>
+              <ul *ngIf="fila.errores.length > 0" class="error-list">
+                <li *ngFor="let error of fila.errores">{{ error }}</li>
+              </ul>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" *ngIf="resultado() as r">
+    <h3>Resultado de importación</h3>
+
+    <div class="result-grid">
+      <article class="metric-card">
+        <span class="metric-label">Filas procesadas</span>
+        <strong class="metric-value">{{ r.totalFilasProcesadas }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Insertados</span>
+        <strong class="metric-value">{{ r.insertados }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Reactivados / ajustados</span>
+        <strong class="metric-value">{{ r.reactivadosOAjustados }}</strong>
+      </article>
+
+      <article class="metric-card">
+        <span class="metric-label">Rechazados</span>
+        <strong class="metric-value">{{ r.rechazados }}</strong>
+      </article>
+    </div>
+
+    <div class="message info" *ngIf="r.mensajes.length > 0">
+      <div *ngFor="let mensaje of r.mensajes">
+        {{ mensaje }}
+      </div>
+    </div>
+  </section>
+</div>
