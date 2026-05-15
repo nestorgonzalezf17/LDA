@@ -13,10 +13,12 @@ namespace EDD.Api.Controllers.LDA;
 public class NotificacionesController : ControllerBase
 {
     private readonly INotificacionRepository _repository;
+    private readonly IPdfService _pdfService;
 
-    public NotificacionesController(INotificacionRepository repository)
+    public NotificacionesController(INotificacionRepository repository, IPdfService pdfService)
     {
         _repository = repository;
+        _pdfService = pdfService;
     }
 
     [HttpGet]
@@ -61,5 +63,32 @@ public class NotificacionesController : ControllerBase
         var success = await _repository.ActualizarRegistroAsync(id, registro);
         if (!success) return NotFound();
         return NoContent();
+    }
+
+    [HttpPost("preview")]
+    public async Task<IActionResult> Preview([FromBody] NotificacionSaveDto dto)
+    {
+        // Obtener la ruta de la plantilla usando el IdRelacionHecho
+        var relaciones = await _repository.ListarRelacionesHechoAsync();
+        var relacion = System.Linq.Enumerable.FirstOrDefault(relaciones, r => r.IdRelacionHecho == dto.IdRelacionHecho);
+
+        if (relacion == null || string.IsNullOrEmpty(relacion.RutaPlantilla))
+        {
+            return BadRequest(new { mensaje = "El hecho seleccionado no tiene una plantilla asociada." });
+        }
+
+        try
+        {
+            var pdfBytes = await _pdfService.GenerarPdfNotificacionAsync(dto, relacion.RutaPlantilla);
+            return File(pdfBytes, "application/pdf");
+        }
+        catch (System.IO.FileNotFoundException ex)
+        {
+            return NotFound(new { mensaje = ex.Message });
+        }
+        catch (System.Exception ex)
+        {
+            return StatusCode(500, new { mensaje = "Error al generar la previsualización: " + ex.Message });
+        }
     }
 }

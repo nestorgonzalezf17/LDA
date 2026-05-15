@@ -8,7 +8,7 @@
     <section class="card form-card">
       <h3>Datos del llamado</h3>
 
-      <form [formGroup]="form" (ngSubmit)="guardar()">
+      <form [formGroup]="form">
         <div class="field">
           <label>Fecha de Notificación</label>
           <input type="text" formControlName="fechaNotificacion" readonly>
@@ -70,8 +70,12 @@
         </div>
 
         <div class="actions">
-          <button type="submit" [disabled]="loading() || !empleadoValido()">
-            {{ loading() ? 'Guardando...' : 'Generar Llamado' }}
+          <button type="button" class="secondary" (click)="previsualizar()" [disabled]="loadingPreview() || !empleadoValido()">
+            {{ loadingPreview() ? 'Cargando...' : 'Cargar datos / Previsualizar' }}
+          </button>
+
+          <button type="button" (click)="enviarNotificacion()" [disabled]="loading() || !empleadoValido()">
+            {{ loading() ? 'Enviando...' : 'Enviar Notificación' }}
           </button>
         </div>
 
@@ -83,9 +87,14 @@
     <!-- Columna de Previsualización (Espacio Libre) -->
     <section class="card plantilla-card">
       <h3>Previsualización del Documento</h3>
-      <div class="empty-state">
-        El borrador del documento aparecerá aquí a medida que complete los datos.
-      </div>
+      
+      @if (previewUrl()) {
+        <iframe [src]="previewUrl()" width="100%" height="600px" style="border: none; border-radius: 8px;"></iframe>
+      } @else {
+        <div class="empty-state">
+          El borrador del documento aparecerá aquí a medida que complete los datos y presione "Cargar datos".
+        </div>
+      }
     </section>
   </div>
 </div>

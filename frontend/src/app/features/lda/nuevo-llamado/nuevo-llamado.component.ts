@@ -5,6 +5,7 @@ import { LdaService, TipoCarga, RelacionHecho } from '../../../core/services/lda
 import { EvaluacionesService } from '../../../core/services/evaluaciones.service';
 import { finalize } from 'rxjs';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-nuevo-llamado',
@@ -18,17 +19,21 @@ export class NuevoLlamadoComponent implements OnInit {
   private readonly ldaService = inject(LdaService);
   private readonly evaluacionesService = inject(EvaluacionesService);
   private readonly router = inject(Router);
+  private readonly sanitizer = inject(DomSanitizer);
 
   form: FormGroup;
   tiposCarga = signal<TipoCarga[]>([]);
   relacionesHecho = signal<RelacionHecho[]>([]);
   
   loading = signal(false);
+  loadingPreview = signal(false);
   buscandoEmpleado = signal(false);
   empleadoValido = signal(false);
   
   errorMessage = signal('');
   successMessage = signal('');
+  
+  previewUrl = signal<SafeResourceUrl | null>(null);
 
   constructor() {
     this.form = this.fb.group({
@@ -77,7 +82,36 @@ export class NuevoLlamadoComponent implements OnInit {
       });
   }
 
-  guardar(): void {
+  previsualizar(): void {
+    if (this.form.invalid || !this.empleadoValido()) {
+      this.form.markAllAsTouched();
+      this.errorMessage.set('Debe completar todos los campos antes de previsualizar.');
+      return;
+    }
+
+    this.loadingPreview.set(true);
+    this.errorMessage.set('');
+    
+    const formValues = this.form.getRawValue();
+    const dto = {
+      ...formValues,
+      fechaHecho: new Date(formValues.fechaHecho).toISOString()
+    };
+
+    this.ldaService.previsualizar(dto)
+      .pipe(finalize(() => this.loadingPreview.set(false)))
+      .subscribe({
+        next: (blob) => {
+          const url = URL.createObjectURL(blob);
+          this.previewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        },
+        error: (err) => {
+          this.errorMessage.set('Error al generar la previsualización. Verifique que la relación del hecho tenga una plantilla válida configurada.');
+        }
+      });
+  }
+
+  enviarNotificacion(): void {
     if (this.form.invalid || !this.empleadoValido()) {
       this.form.markAllAsTouched();
       return;
@@ -94,7 +128,7 @@ export class NuevoLlamadoComponent implements OnInit {
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: () => {
-          this.successMessage.set('Llamado de atención registrado correctamente.');
+          this.successMessage.set('Llamado de atención registrado y enviado correctamente.');
           setTimeout(() => this.router.navigate(['/inicio']), 2000);
         },
         error: (err) => {

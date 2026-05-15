@@ -66,7 +66,7 @@ public class NotificacionRepository : INotificacionRepository
     public async Task<IEnumerable<RelacionHechoDto>> ListarRelacionesHechoAsync()
     {
         using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<RelacionHechoDto>("SELECT IdRelacionHecho, TituloRel FROM LDA.RelacionHecho ORDER BY TituloRel");
+        return await connection.QueryAsync<RelacionHechoDto>("SELECT IdRelacionHecho, TituloRel, RutaPlantilla FROM LDA.RelacionHecho ORDER BY TituloRel");
     }
 
     public async Task<int> CrearAsync(NotificacionSaveDto dto)

@@ -58,6 +58,10 @@ export class LdaService {
     return this.http.put<void>(`${this.baseUrl}/${id}/registro`, registro);
   }
 
+  previsualizar(dto: NotificacionSaveDto): Observable<Blob> {
+    return this.http.post(`${this.baseUrl}/preview`, dto, { responseType: 'blob' });
+  }
+
   // Catálogos
   listarTiposCarga(): Observable<TipoCarga[]> {
     return this.http.get<TipoCarga[]>(`${this.baseUrl}/catalogos/tipo-carga`);
