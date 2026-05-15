@@ -1,0 +1,91 @@
+<div class="evaluacion-page">
+  <div class="header">
+    <h2>Nuevo llamado de atención</h2>
+    <p>Complete la información del hecho y valide al empleado desde nómina.</p>
+  </div>
+
+  <div class="grid">
+    <section class="card form-card">
+      <h3>Datos del llamado</h3>
+
+      <form [formGroup]="form" (ngSubmit)="guardar()">
+        <div class="field">
+          <label>Fecha de Notificación</label>
+          <input type="text" formControlName="fechaNotificacion" readonly>
+        </div>
+
+        <div class="field">
+          <label>Cédula del Empleado</label>
+          <div class="cedula-search">
+            <input type="text" formControlName="cedulaEmpleado" placeholder="Digite la cédula" (keyup.enter)="buscarEmpleado()">
+            <button type="button" class="secondary buscar-empleado-btn" (click)="buscarEmpleado()" [disabled]="buscandoEmpleado()">
+              {{ buscandoEmpleado() ? '...' : 'Buscar' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Nombre Completo</label>
+          <input type="text" formControlName="nombreCompletoEmpleado" readonly placeholder="Se carga desde nómina">
+        </div>
+
+        <div class="field">
+          <label>Placa del Vehículo</label>
+          <input type="text" formControlName="placaVehiculoAsignado" placeholder="Ej: ABC123">
+        </div>
+
+        <div class="field">
+          <label>Operación</label>
+          <input type="text" formControlName="operacion" placeholder="Ej: Regional, Local...">
+        </div>
+
+        <div class="field">
+          <label>Tipo de Carga</label>
+          <select formControlName="idTipoCarga">
+            <option [ngValue]="null">Seleccione...</option>
+            @for (item of tiposCarga(); track item.idTipoCarga) {
+              <option [ngValue]="item.idTipoCarga">{{ item.tituloTipoCarga }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Relación del Hecho</label>
+          <select formControlName="idRelacionHecho">
+            <option [ngValue]="null">Seleccione...</option>
+            @for (item of relacionesHecho(); track item.idRelacionHecho) {
+              <option [ngValue]="item.idRelacionHecho">{{ item.tituloRel }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Fecha del Hecho</label>
+          <input type="date" formControlName="fechaHecho">
+        </div>
+
+        <div class="field">
+          <label>Descripción del Reporte</label>
+          <textarea formControlName="registro" rows="3" placeholder="Describa lo sucedido..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" [disabled]="loading() || !empleadoValido()">
+            {{ loading() ? 'Guardando...' : 'Generar Llamado' }}
+          </button>
+        </div>
+
+        @if (errorMessage()) { <div class="message error">{{ errorMessage() }}</div> }
+        @if (successMessage()) { <div class="message success">{{ successMessage() }}</div> }
+      </form>
+    </section>
+
+    <!-- Columna de Previsualización (Espacio Libre) -->
+    <section class="card plantilla-card">
+      <h3>Previsualización del Documento</h3>
+      <div class="empty-state">
+        El borrador del documento aparecerá aquí a medida que complete los datos.
+      </div>
+    </section>
+  </div>
+</div>

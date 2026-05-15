@@ -107,6 +107,11 @@ export const routes: Routes = [
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
           import('./features/admin/carga-masiva/carga-masiva.component').then(m => m.CargaMasivaComponent)
+      },
+      {
+        path: 'lda/nuevo',
+        loadComponent: () =>
+          import('./features/lda/nuevo-llamado/nuevo-llamado.component').then(m => m.NuevoLlamadoComponent)
       }
         
     ]

@@ -1,0 +1,51 @@
+GET http://localhost:5047/api/lda/notificaciones HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AZWRkLmNvbSIsIm5vbWJyZUNvbXBsZXRvIjoiQWRtaW4gRGVzYXJyb2xsbyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGVkZC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTc3ODg3OTM4MSwiaXNzIjoiRURELkFwaSIsImF1ZCI6IkVERC5BcHAifQ.U84F9LS793BHLQPVvtpeSQXZaUMuGp7_X-AZ9Ywn7Jw
+Content-Type: application/json
+### MÓDULO LDA - PRUEBAS DE API
+@baseUrl = http://localhost:5047/api/lda
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AZWRkLmNvbSIsIm5vbWJyZUNvbXBsZXRvIjoiQWRtaW4gRGVzYXJyb2xsbyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGVkZC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTc3ODg3OTM4MSwiaXNzIjoiRURELkFwaSIsImF1ZCI6IkVERC5BcHAifQ.U84F9LS793BHLQPVvtpeSQXZaUMuGp7_X-AZ9Ywn7Jw
+
+### 1. Obtener Catálogo: Tipos de Carga
+GET {{baseUrl}}/notificaciones/catalogos/tipo-carga
+Authorization: Bearer {{token}}
+
+### 2. Obtener Catálogo: Relaciones de Hechos
+GET {{baseUrl}}/notificaciones/catalogos/relacion-hecho
+Authorization: Bearer {{token}}
+
+### 3. Listar Notificaciones (Sin filtros)
+GET {{baseUrl}}/notificaciones
+Authorization: Bearer {{token}}
+
+### 4. Listar Notificaciones con Filtros (Ejemplo)
+# Filtros disponibles: cedulaEmpleado, idTipoCarga, placa, operacion, fechaHecho, fechaNotificacion, registro
+GET {{baseUrl}}/notificaciones?placa=XYZ789&fechaHecho=2024-05-15 
+Authorization: Bearer {{token}}
+
+### 5. Listar por Tipo de Carga específico
+GET {{baseUrl}}/notificaciones?idTipoCarga=1
+Authorization: Bearer {{token}}
+
+### 6. Crear una nueva Notificación
+POST {{baseUrl}}/notificaciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "cedulaEmpleado": "102030",
+    "nombreCompletoEmpleado": "Maria Lopez",
+    "placaVehiculoAsignado": "XYZ789",
+    "idRelacionHecho": 1,
+    "idTipoCarga": 1,
+    "operacion": "Entrega Regional",
+    "fechaHecho": "2024-05-15T10:30:00",
+    "registro": "Observación inicial"
+}
+
+### 7. Actualizar el Registro (Reporte) de una Notificación
+# Reemplazar {id} por un ID existente (ej: 1)
+PUT {{baseUrl}}/notificaciones/1/registro
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+"Este es el nuevo reporte actualizado para la notificación."

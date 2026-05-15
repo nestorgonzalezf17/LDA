@@ -25,6 +25,11 @@
             Reporte por empleado
           </a>
         </ng-container>
+
+        <ng-container *ngIf="hasRole(['ADMIN', 'NOTIFICADOR'])">
+          <div class="sidebar-divider">LDA - LOGÍSTICA</div>
+          <a routerLink="/lda/nuevo" routerLinkActive="active">Nuevo llamado de atención</a>
+        </ng-container>
       </nav>
     </div>
   </aside>
