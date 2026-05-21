@@ -45,7 +45,7 @@ export class NuevoLlamadoComponent implements OnInit {
       idRelacionHecho: [null, [Validators.required]],
       operacion: [''],
       fechaHecho: [new Date().toISOString().substring(0, 10), [Validators.required]],
-      registro: ['', [Validators.required]]
+      registro: ['']
     });
   }
 
@@ -95,6 +95,8 @@ export class NuevoLlamadoComponent implements OnInit {
     const formValues = this.form.getRawValue();
     const dto = {
       ...formValues,
+      operacion: formValues.operacion ?? '',
+      registro: formValues.registro ?? '',
       fechaHecho: new Date(formValues.fechaHecho).toISOString()
     };
 
@@ -118,22 +120,48 @@ export class NuevoLlamadoComponent implements OnInit {
     }
 
     this.loading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
+    
     const formValues = this.form.getRawValue();
     const dto = {
       ...formValues,
+      operacion: formValues.operacion ?? '',
+      registro: formValues.registro ?? '',
       fechaHecho: new Date(formValues.fechaHecho).toISOString()
     };
 
-    this.ldaService.crear(dto)
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: () => {
-          this.successMessage.set('Llamado de atención registrado y enviado correctamente.');
-          setTimeout(() => this.router.navigate(['/inicio']), 2000);
-        },
-        error: (err) => {
-          this.errorMessage.set(err.error?.mensaje || 'Error al guardar el registro.');
-        }
-      });
+    this.ldaService.crear(dto).subscribe({
+      next: () => {
+        // Al guardar con éxito, solicitamos el PDF y lo descargamos
+        this.ldaService.previsualizar(dto)
+          .pipe(finalize(() => {
+            this.loading.set(false);
+            this.successMessage.set('Llamado de atención registrado y PDF descargado correctamente.');
+            setTimeout(() => this.router.navigate(['/lda/listado']), 2000);
+          }))
+          .subscribe({
+            next: (blob) => {
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `Llamado_Atencion_${dto.cedulaEmpleado}_${new Date().toISOString().substring(0, 10)}.pdf`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            },
+            error: (err) => {
+              console.error('Error al descargar el PDF:', err);
+              // Si el PDF falla, ya se guardó en BD, así que igual redireccionamos con un aviso
+              this.successMessage.set('Llamado registrado correctamente, pero no se pudo generar la descarga del PDF.');
+            }
+          });
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.errorMessage.set(err.error?.mensaje || 'Error al guardar el registro.');
+      }
+    });
   }
 }

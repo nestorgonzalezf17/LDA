@@ -110,8 +110,17 @@ export const routes: Routes = [
       },
       {
         path: 'lda/nuevo',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'NOTIFICADOR'] },
         loadComponent: () =>
           import('./features/lda/nuevo-llamado/nuevo-llamado.component').then(m => m.NuevoLlamadoComponent)
+      },
+      {
+        path: 'lda/listado',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN', 'NOTIFICADOR'] },
+        loadComponent: () =>
+          import('./features/lda/listado-notificaciones/listado-notificaciones.component').then(m => m.ListadoNotificacionesComponent)
       }
         
     ]

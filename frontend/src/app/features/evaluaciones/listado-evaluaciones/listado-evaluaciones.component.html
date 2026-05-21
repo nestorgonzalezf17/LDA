@@ -118,32 +118,34 @@
           <td>{{ e.evaluador }}</td>
           <td>{{ e.estado }}</td>
           <td>{{ e.calificacionTotal ?? '-' }}</td>
-          <td class="acciones-col">
-            <ng-container *ngIf="e.estado === 'BORRADOR'; else accionesFinalizadas">
-              <button
-                type="button"
-                class="link-btn"
-                (click)="continuar(e.idEvaluacion)">
-                Continuar
-              </button>
+          <td>
+            <div class="acciones-col">
+              <ng-container *ngIf="e.estado === 'BORRADOR'; else accionesFinalizadas">
+                <button
+                  type="button"
+                  class="link-btn"
+                  (click)="continuar(e.idEvaluacion)">
+                  Continuar
+                </button>
 
-              <button
-                type="button"
-                class="link-btn danger"
-                (click)="eliminarBorrador(e.idEvaluacion)"
-                [disabled]="deletingId() === e.idEvaluacion">
-                {{ deletingId() === e.idEvaluacion ? 'Eliminando...' : 'Eliminar' }}
-              </button>
-            </ng-container>
+                <button
+                  type="button"
+                  class="link-btn danger"
+                  (click)="eliminarBorrador(e.idEvaluacion)"
+                  [disabled]="deletingId() === e.idEvaluacion">
+                  {{ deletingId() === e.idEvaluacion ? 'Eliminando...' : 'Eliminar' }}
+                </button>
+              </ng-container>
 
-            <ng-template #accionesFinalizadas>
-              <button
-                type="button"
-                class="link-btn"
-                (click)="verDetalle(e.idEvaluacion)">
-                Ver detalle
-              </button>
-            </ng-template>
+              <ng-template #accionesFinalizadas>
+                <button
+                  type="button"
+                  class="link-btn"
+                  (click)="verDetalle(e.idEvaluacion)">
+                  Ver detalle
+                </button>
+              </ng-template>
+            </div>
           </td>
         </tr>
       </tbody>

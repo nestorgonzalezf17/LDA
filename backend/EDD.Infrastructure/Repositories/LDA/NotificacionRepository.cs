@@ -30,14 +30,14 @@ public class NotificacionRepository : INotificacionRepository
             SELECT 
                 n.IdNotificacion, n.CedulaEmpleado, n.NombreCompletoEmpleado, 
                 n.PlacaVehiculoAsignado, n.Operacion, n.FechaHecho, 
-                n.FechaNotificacion, n.Registro,
+                n.FechaNotificacion, n.Registro, n.IdRelacionHecho, n.IdTipoCarga,
                 rh.TituloRel AS TituloRelacionHecho,
                 tc.TituloTipoCarga AS TituloTipoCarga
             FROM LDA.Notificaciones n
             INNER JOIN LDA.RelacionHecho rh ON n.IdRelacionHecho = rh.IdRelacionHecho
             INNER JOIN LDA.TipoCarga tc ON n.IdTipoCarga = tc.IdTipoCarga
             WHERE 
-                (@Cedula IS NULL OR n.CedulaEmpleado = @Cedula) AND
+                (@Cedula IS NULL OR n.CedulaEmpleado LIKE '%' + @Cedula + '%') AND
                 (@IdTipoCarga IS NULL OR n.IdTipoCarga = @IdTipoCarga) AND
                 (@Placa IS NULL OR n.PlacaVehiculoAsignado LIKE '%' + @Placa + '%') AND
                 (@Operacion IS NULL OR n.Operacion LIKE '%' + @Operacion + '%') AND
@@ -60,7 +60,7 @@ public class NotificacionRepository : INotificacionRepository
     public async Task<IEnumerable<TipoCargaDto>> ListarTiposCargaAsync()
     {
         using var connection = _connectionFactory.CreateConnection();
-        return await connection.QueryAsync<TipoCargaDto>("SELECT IdTipoCarga, TituloTipoCarga FROM LDA.TipoCarga ORDER BY TituloTipoCarga");
+        return await connection.QueryAsync<TipoCargaDto>("SELECT IdTipoCarga, TituloTipoCarga, TipoCarga FROM LDA.TipoCarga ORDER BY TituloTipoCarga");
     }
 
     public async Task<IEnumerable<RelacionHechoDto>> ListarRelacionesHechoAsync()

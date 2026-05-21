@@ -1,10 +1,11 @@
-GET http://localhost:5047/api/lda/notificaciones HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AZWRkLmNvbSIsIm5vbWJyZUNvbXBsZXRvIjoiQWRtaW4gRGVzYXJyb2xsbyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGVkZC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTc3ODg3OTM4MSwiaXNzIjoiRURELkFwaSIsImF1ZCI6IkVERC5BcHAifQ.U84F9LS793BHLQPVvtpeSQXZaUMuGp7_X-AZ9Ywn7Jw
+
+@baseUrl = http://localhost:5047/api/lda
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AZWRkLmNvbSIsIm5vbWJyZUNvbXBsZXRvIjoiQWRtaW4gRGVzYXJyb2xsbyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGVkZC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTc3OTIyMTc2NSwiaXNzIjoiRURELkFwaSIsImF1ZCI6IkVERC5BcHAifQ.U8D8LcaKdTy6QjQhB_welTDh7wqHkTq3H7Y4iYyJfRo
+
+GET {{baseUrl}}/notificaciones HTTP/1.1
+Authorization: Bearer {{token}}
 Content-Type: application/json
 ### MÓDULO LDA - PRUEBAS DE API
-@baseUrl = http://localhost:5047/api/lda
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW5AZWRkLmNvbSIsIm5vbWJyZUNvbXBsZXRvIjoiQWRtaW4gRGVzYXJyb2xsbyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2VtYWlsYWRkcmVzcyI6ImFkbWluQGVkZC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJBRE1JTiIsImV4cCI6MTc3ODg3OTM4MSwiaXNzIjoiRURELkFwaSIsImF1ZCI6IkVERC5BcHAifQ.U84F9LS793BHLQPVvtpeSQXZaUMuGp7_X-AZ9Ywn7Jw
-
 ### 1. Obtener Catálogo: Tipos de Carga
 GET {{baseUrl}}/notificaciones/catalogos/tipo-carga
 Authorization: Bearer {{token}}
@@ -49,3 +50,19 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 "Este es el nuevo reporte actualizado para la notificación."
+
+### 8. Previsualizar PDF (Genera el documento con datos inyectados)
+POST {{baseUrl}}/notificaciones/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "cedulaEmpleado": "101010",
+    "nombreCompletoEmpleado": "JUAN PEREZ",
+    "placaVehiculoAsignado": "ABC123",
+    "idRelacionHecho": 1,
+    "idTipoCarga": 1,
+    "operacion": "OPERACION PRUEBA",
+    "fechaHecho": "2024-05-15",
+    "registro": "Este es un registro de prueba para la previsualización"
+}

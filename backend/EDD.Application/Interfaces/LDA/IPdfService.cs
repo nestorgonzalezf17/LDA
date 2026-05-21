@@ -5,5 +5,5 @@ namespace EDD.Application.Interfaces.LDA;
 
 public interface IPdfService
 {
-    Task<byte[]> GenerarPdfNotificacionAsync(NotificacionSaveDto dto, string rutaPlantilla);
+    Task<byte[]> GenerarPdfNotificacionAsync(NotificacionSaveDto dto, string rutaPlantilla, string tipoCargaTitulo);
 }

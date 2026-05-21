@@ -10,6 +10,8 @@ export interface NotificacionDto {
   placaVehiculoAsignado: string;
   tituloRelacionHecho: string;
   tituloTipoCarga: string;
+  idRelacionHecho: number;
+  idTipoCarga: number;
   operacion?: string;
   fechaHecho: string;
   fechaNotificacion: string;
@@ -30,6 +32,7 @@ export interface NotificacionSaveDto {
 export interface TipoCarga {
   idTipoCarga: number;
   tituloTipoCarga: string;
+  tipoCarga: string;
 }
 
 export interface RelacionHecho {

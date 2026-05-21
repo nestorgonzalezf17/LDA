@@ -1,0 +1,123 @@
+<div class="listado-page">
+  <div class="header">
+    <div class="header-title-container">
+      <h2>Listado de llamados de atención (LDA)</h2>
+      <p>Consulta los llamados de atención registrados y descarga sus documentos PDF.</p>
+    </div>
+    <button type="button" class="success" (click)="irANuevo()">
+      Nuevo Llamado
+    </button>
+  </div>
+
+  <section class="card filtros-card">
+    <h3>Filtros</h3>
+
+    <form [formGroup]="filtrosForm">
+      <div class="filtros-grid">
+        <div class="field">
+          <label for="cedulaEmpleado">Cédula</label>
+          <input id="cedulaEmpleado" type="text" formControlName="cedulaEmpleado" placeholder="Ej: 12345" />
+        </div>
+
+        <div class="field">
+          <label for="idTipoCarga">Tipo de Carga</label>
+          <select id="idTipoCarga" formControlName="idTipoCarga">
+            <option [ngValue]="null">Todos</option>
+            <option *ngFor="let tipo of tiposCarga()" [ngValue]="tipo.idTipoCarga">
+              {{ tipo.tipoCarga }}
+            </option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="placa">Placa</label>
+          <input id="placa" type="text" formControlName="placa" placeholder="Ej: ABC123" />
+        </div>
+
+        <div class="field">
+          <label for="operacion">Operación</label>
+          <input id="operacion" type="text" formControlName="operacion" placeholder="Ej: Local" />
+        </div>
+
+        <div class="field">
+          <label for="fechaHecho">Fecha del Hecho</label>
+          <input id="fechaHecho" type="date" formControlName="fechaHecho" />
+        </div>
+
+        <div class="field">
+          <label for="fechaNotificacion">Fecha de Notificación</label>
+          <input id="fechaNotificacion" type="date" formControlName="fechaNotificacion" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="buscar()" [disabled]="loadingNotificaciones()">
+          {{ loadingNotificaciones() ? 'Buscando...' : 'Buscar' }}
+        </button>
+
+        <button type="button" class="secondary" (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </form>
+
+    <div class="message error" *ngIf="errorMessage()">
+      {{ errorMessage() }}
+    </div>
+
+    <div class="message success" *ngIf="successMessage()">
+      {{ successMessage() }}
+    </div>
+  </section>
+
+  <section class="card tabla-card">
+    <h3>Resultados</h3>
+
+    <div *ngIf="loadingNotificaciones()" class="empty-state">
+      Cargando llamados de atención...
+    </div>
+
+    <div *ngIf="!loadingNotificaciones() && notificaciones().length === 0" class="empty-state">
+      No se encontraron llamados de atención registrados.
+    </div>
+
+    <table *ngIf="!loadingNotificaciones() && notificaciones().length > 0">
+      <thead>
+        <tr>
+          <th>Fecha Notif.</th>
+          <th>Empleado</th>
+          <th>Cédula</th>
+          <th>Placa</th>
+          <th>Tipo Carga</th>
+          <th>Relación Hecho</th>
+          <th>Operación</th>
+          <th>Fecha Hecho</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let n of notificaciones()">
+          <td>{{ n.fechaNotificacion | date:'dd/MM/yyyy' }}</td>
+          <td><strong>{{ n.nombreCompletoEmpleado }}</strong></td>
+          <td>{{ n.cedulaEmpleado }}</td>
+          <td>{{ n.placaVehiculoAsignado }}</td>
+          <td>{{ n.tituloTipoCarga }}</td>
+          <td>{{ n.tituloRelacionHecho }}</td>
+          <td>{{ n.operacion || '-' }}</td>
+          <td>{{ n.fechaHecho | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <div class="acciones-col">
+              <button
+                type="button"
+                class="link-btn"
+                (click)="descargarPdf(n)"
+                [disabled]="downloadingId() === n.idNotificacion">
+                {{ downloadingId() === n.idNotificacion ? 'Descargando...' : 'Descargar PDF' }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

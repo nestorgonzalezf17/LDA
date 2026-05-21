@@ -32,6 +32,12 @@ BEGIN
 END
 GO
 
+IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'LDA')
+BEGIN
+    EXEC('CREATE SCHEMA [LDA]');
+END
+GO
+
 -- 3. Crear Tablas del esquema core (Seguridad)
 IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[core].[Usuarios]') AND type in (N'U'))
 BEGIN
@@ -120,6 +126,48 @@ BEGIN
     );
 END
 GO
+
+-- 4.1 Crear Tablas del esquema LDA (Llamados de Atención / Notificaciones)
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[LDA].[RelacionHecho]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [LDA].[RelacionHecho](
+        [IdRelacionHecho] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [TituloRel] [nvarchar](200) NOT NULL,
+        [RutaPlantilla] [nvarchar](255) NULL
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[LDA].[TipoCarga]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [LDA].[TipoCarga](
+        [IdTipoCarga] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [TituloTipoCarga] [nvarchar](50) NOT NULL,
+        [Descripcion] [nvarchar](200) NULL,
+        [TipoCarga] [nvarchar](50) NOT NULL
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[LDA].[Notificaciones]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [LDA].[Notificaciones](
+        [IdNotificacion] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [CedulaEmpleado] [nvarchar](50) NOT NULL,
+        [NombreCompletoEmpleado] [nvarchar](200) NOT NULL,
+        [PlacaVehiculoAsignado] [nvarchar](50) NOT NULL,
+        [IdRelacionHecho] [int] NOT NULL,
+        [IdTipoCarga] [int] NOT NULL,
+        [Operacion] [nvarchar](200) NULL,
+        [FechaHecho] [datetime] NOT NULL,
+        [FechaNotificacion] [datetime] NOT NULL DEFAULT GETDATE(),
+        [Registro] [nvarchar](MAX) NULL,
+        FOREIGN KEY ([IdRelacionHecho]) REFERENCES [LDA].[RelacionHecho]([IdRelacionHecho]),
+        FOREIGN KEY ([IdTipoCarga]) REFERENCES [LDA].[TipoCarga]([IdTipoCarga])
+    );
+END
+GO
+
 
 -- 5. Procedimientos Almacenados (Placeholders funcionales)
 
@@ -219,6 +267,27 @@ BEGIN
     VALUES (@IdUser, @IdRol, @IdApp);
 END
 GO
+
+-- Datos iniciales para LDA.RelacionHecho
+IF NOT EXISTS (SELECT 1 FROM [LDA].[RelacionHecho])
+BEGIN
+    INSERT INTO [LDA].[RelacionHecho] (TituloRel, RutaPlantilla) VALUES
+    ('DESVIO DE RUTA NO AUTORIZADO', 'DESVIO DE RUTA NO AUTORIZADO.pdf'),
+    ('LLAMADO DE ATENCION PARQUEO NO AUTORIZADO', 'PARQUEO EN PUNTO NO AUTORIZADO.pdf'),
+    ('PERNOCTACION EN PUNTO NO AUTORIZADO', 'PERNOCTACION EN PUNTO NO AUTORIZADO.pdf'),
+    ('INCUMPLIMIENTO DE FRANJA DE DESCANSO', 'INCUMPLIMIENTO DE FRANJA DE DESCANSO.pdf'),
+    ('EXCESO DE VELOCIDAD EN CURVA', 'EXCESO DE VELOCIDAD EN CURVA.pdf');
+END
+
+-- Datos iniciales para LDA.TipoCarga
+IF NOT EXISTS (SELECT 1 FROM [LDA].[TipoCarga])
+BEGIN
+    INSERT INTO [LDA].[TipoCarga] (TituloTipoCarga, Descripcion, TipoCarga) VALUES
+    ('carga seca', 'Objetos contables (televisores)', 'Carga seca'),
+    ('carga seca para el cliente Bavaria', 'Carga seca para el cliente Bavaria', 'TEV');
+END
+GO
+
 
 -- 7. Crear Usuario de SQL Server para la Aplicación
 IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'edd_user')

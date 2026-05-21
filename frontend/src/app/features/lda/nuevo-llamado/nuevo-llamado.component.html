@@ -44,7 +44,7 @@
           <select formControlName="idTipoCarga">
             <option [ngValue]="null">Seleccione...</option>
             @for (item of tiposCarga(); track item.idTipoCarga) {
-              <option [ngValue]="item.idTipoCarga">{{ item.tituloTipoCarga }}</option>
+              <option [ngValue]="item.idTipoCarga">{{ item.tipoCarga }}</option>
             }
           </select>
         </div>
@@ -75,7 +75,7 @@
           </button>
 
           <button type="button" (click)="enviarNotificacion()" [disabled]="loading() || !empleadoValido()">
-            {{ loading() ? 'Enviando...' : 'Enviar Notificación' }}
+            {{ loading() ? 'Procesando...' : 'Enviar y Descargar PDF' }}
           </button>
         </div>
 

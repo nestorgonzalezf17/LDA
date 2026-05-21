@@ -77,9 +77,14 @@ public class NotificacionesController : ControllerBase
             return BadRequest(new { mensaje = "El hecho seleccionado no tiene una plantilla asociada." });
         }
 
+        // Obtener el título del tipo de carga seleccionado para el PDF
+        var tiposCarga = await _repository.ListarTiposCargaAsync();
+        var tipoCarga = System.Linq.Enumerable.FirstOrDefault(tiposCarga, t => t.IdTipoCarga == dto.IdTipoCarga);
+        var tipoCargaTitulo = tipoCarga?.TituloTipoCarga ?? string.Empty;
+
         try
         {
-            var pdfBytes = await _pdfService.GenerarPdfNotificacionAsync(dto, relacion.RutaPlantilla);
+            var pdfBytes = await _pdfService.GenerarPdfNotificacionAsync(dto, relacion.RutaPlantilla, tipoCargaTitulo);
             return File(pdfBytes, "application/pdf");
         }
         catch (System.IO.FileNotFoundException ex)

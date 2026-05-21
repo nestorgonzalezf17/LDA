@@ -4,6 +4,14 @@
   gap: 1rem;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .header p {
   margin-top: 0.25rem;
   color: #6b7280;
@@ -18,7 +26,7 @@
 
 .filtros-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 1rem;
 }
 
@@ -59,11 +67,12 @@ button {
 
 button.secondary {
   background: #e5e7eb;
+  color: #374151;
 }
 
 button.success {
-  background: #dcfce7;
-  color: #166534;
+  background: #3769a7;
+  color: #ffffff;
 }
 
 .message.error {
@@ -72,6 +81,14 @@ button.success {
   border-radius: 10px;
   background: #fee2e2;
   color: #991b1b;
+}
+
+.message.success {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: #dcfce7;
+  color: #166534;
 }
 
 .empty-state {
