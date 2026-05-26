@@ -77,8 +77,8 @@ public class UsuarioRepository : IUsuarioRepository
             if (string.IsNullOrWhiteSpace(clave))
                 throw new Exception("La clave es obligatoria.");
 
-            if (rol != "ADMIN" && rol != "EVALUADOR")
-                throw new Exception("El rol debe ser ADMIN o EVALUADOR.");
+            if (rol != "ADMIN" && rol != "EVALUADOR" && rol != "NOTIFICADOR")
+                throw new Exception("El rol debe ser ADMIN, EVALUADOR o NOTIFICADOR.");
 
             // Validar email único
             var existeEmail = await connection.ExecuteScalarAsync<int>(
@@ -199,8 +199,8 @@ public class UsuarioRepository : IUsuarioRepository
         var rolNormalizado = rol.Trim().ToUpperInvariant();
         var appNormalizada = nombreApp.Trim();
 
-        if (rolNormalizado != "ADMIN" && rolNormalizado != "EVALUADOR")
-            throw new Exception("El rol debe ser ADMIN o EVALUADOR.");
+        if (rolNormalizado != "ADMIN" && rolNormalizado != "EVALUADOR" && rolNormalizado != "NOTIFICADOR")
+            throw new Exception("El rol debe ser ADMIN, EVALUADOR o NOTIFICADOR.");
 
         var idRol = await connection.ExecuteScalarAsync<int?>(@"
             SELECT IdRol 

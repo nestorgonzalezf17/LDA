@@ -77,8 +77,6 @@ public class PdfService : IPdfService
                                 var valText = GetText(vObj);
                                 var defaultValText = GetText(dvObj);
 
-                                System.Console.WriteLine($"[PdfService DEBUG WIDGET] T:'{keyText}' | TU:'{altText}' | V:'{valText}' | DV:'{defaultValText}'");
-
                                 var searchableText = $"{keyText} {altText} {valText} {defaultValText}";
                                 bool ContainsKeywords(params string[] keywords)
                                 {

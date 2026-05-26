@@ -48,11 +48,26 @@ public class AuthController : ControllerBase
         if (!usuarioDb.Activo)
             return Unauthorized(new { mensaje = "El usuario está inactivo." });
 
-        // 🔥 Buscar acceso a EDD
+        // 🔥 Buscar acceso a EDD o LDA
         var rolEdd = roles.FirstOrDefault(r => r.NombreApp == "EDD");
+        var rolLda = roles.FirstOrDefault(r => r.NombreApp == "LDA");
 
-        if (rolEdd is null)
+        if (rolEdd is null && rolLda is null)
             return Forbid();
+
+        // Si alguno es ADMIN, priorizar ADMIN
+        var esAdmin = roles.Any(r => r.NombreRol.Equals("ADMIN", System.StringComparison.OrdinalIgnoreCase));
+        
+        string rolAsignado;
+        if (esAdmin)
+        {
+            rolAsignado = "ADMIN";
+        }
+        else
+        {
+            // De lo contrario, priorizar el rol de EDD si existe, si no el de LDA
+            rolAsignado = rolEdd?.NombreRol ?? rolLda?.NombreRol ?? string.Empty;
+        }
 
         // 🔐 Token
         var usuarioToken = new UsuarioMeDto
@@ -61,7 +76,7 @@ public class AuthController : ControllerBase
             Login = usuarioDb.Login,
             NombreCompleto = usuarioDb.NombreCompleto,
             Correo = usuarioDb.Correo,
-            RolModulo = rolEdd.NombreRol
+            RolModulo = rolAsignado
         };
 
         var token = _tokenService.GenerarToken(usuarioToken);
@@ -72,7 +87,7 @@ public class AuthController : ControllerBase
             Login = usuarioDb.Login,
             NombreCompleto = usuarioDb.NombreCompleto,
             Correo = usuarioDb.Correo,
-            RolModulo = rolEdd.NombreRol,
+            RolModulo = rolAsignado,
             DebeCambiarClave = usuarioDb.DebeCambiarClave, // 🔥 CLAVE DEL FLUJO
             Token = token
         };
