@@ -19,6 +19,7 @@ public class EvaluacionesController : ControllerBase
     }
 
     [HttpGet("empleado-nomina/{cedula}")]
+    [AllowAnonymous]
     public async Task<IActionResult> BuscarEmpleadoNominaPorCedula(string cedula)
     {
         if (string.IsNullOrWhiteSpace(cedula))

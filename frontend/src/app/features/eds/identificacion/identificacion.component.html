@@ -1,0 +1,86 @@
+<div class="auth-page">
+  <section class="auth-shell">
+    <!-- Panel Izquierdo: Branding de EDS -->
+    <aside class="auth-brand">
+      <div class="brand-badge">EDS</div>
+
+      <div class="brand-content">
+        <h1>Encuesta de Satisfacción</h1>
+        <p>
+          Plataforma corporativa para la medición de la satisfacción, el clima organizacional y la cultura de nuestros colaboradores.
+        </p>
+      </div>
+
+      <div class="brand-footer">
+        <span>Sistema de Gestión Humana</span>
+      </div>
+    </aside>
+
+    <!-- Panel Derecho: Formulario de Identificación -->
+    <main class="auth-panel">
+      <form class="auth-card" [formGroup]="form" (ngSubmit)="buscarEmpleado()">
+        <div class="auth-header">
+          <h2>Identificación</h2>
+          <p>Ingresa tu número de cédula para continuar.</p>
+        </div>
+
+        <!-- Campo Cédula con Botón de Validación al lado (estilo password-wrapper) -->
+        <div class="field">
+          <label for="cedula">Cédula del Empleado</label>
+          <div class="password-wrapper">
+            <input
+              id="cedula"
+              type="text"
+              formControlName="cedula"
+              placeholder="Ej: 10203040"
+              (keyup.enter)="buscarEmpleado()"
+              [readonly]="buscando()"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="buscarEmpleado()"
+              [disabled]="buscando() || form.get('cedula')?.invalid"
+            >
+              <span *ngIf="!buscando()">Validar</span>
+              <span *ngIf="buscando()" class="spinner"></span>
+            </button>
+          </div>
+          <small *ngIf="form.controls['cedula'].touched && form.controls['cedula'].invalid">
+            La cédula debe contener solo números.
+          </small>
+        </div>
+
+        <!-- Campo Nombre del Trabajador (Aparece en verde si es válido) -->
+        <div class="field fade-in" *ngIf="empleadoValido()">
+          <label>Nombre del Colaborador</label>
+          <input
+            type="text"
+            [value]="nombreCompleto()"
+            readonly
+            class="input-readonly animate-pulse"
+          />
+        </div>
+
+        <!-- Mensaje de Error en Rojo (Estilo login.component.scss error) -->
+        <div class="error fade-in" *ngIf="errorMessage()">
+          {{ errorMessage() }}
+        </div>
+
+        <!-- Botón Comenzar (Estilo primary-button) -->
+        <button
+          class="primary-button"
+          type="button"
+          (click)="continuar()"
+          [disabled]="!empleadoValido() || buscando()"
+        >
+          Empezar Encuesta
+        </button>
+
+        <p class="auth-note">
+          Si tu número de cédula no se encuentra registrado en nómina, comunícate con Gestión Humana.
+        </p>
+      </form>
+    </main>
+  </section>
+</div>
