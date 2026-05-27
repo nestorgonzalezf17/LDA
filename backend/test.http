@@ -66,3 +66,24 @@ Content-Type: application/json
     "fechaHecho": "2024-05-15",
     "registro": "Este es un registro de prueba para la previsualización"
 }
+
+### =================================================================================
+### MÓDULO EDS - PRUEBAS DE API
+### =================================================================================
+
+### 9. Obtener Árbol por Instrumento - Clima y Cultura (ID 1)
+GET http://localhost:5047/api/eds/instrumentos/1/arbol HTTP/1.1
+
+
+### 10. Obtener Árbol por Instrumento - Liderazgo (ID 2)
+GET http://localhost:5047/api/eds/instrumentos/2/arbol HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 11. Obtener Árbol por Instrumento - Microclima (ID 3)
+GET http://localhost:5047/api/eds/instrumentos/3/arbol HTTP/1.1
+Authorization: Bearer {{token}}
+
+### 12. Obtener Árbol por Instrumento Inexistente (Retorna 404)
+GET http://localhost:5047/api/eds/instrumentos/999/arbol HTTP/1.1
+Authorization: Bearer {{token}}
+

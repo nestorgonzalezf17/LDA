@@ -7,6 +7,8 @@ using EDD.Infrastructure.Services;
 using EDD.Infrastructure.Services.LDA;
 using EDD.Application.Interfaces.LDA;
 using EDD.Infrastructure.Repositories.LDA;
+using EDD.Application.Interfaces.EDS;
+using EDD.Infrastructure.Repositories.EDS;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.IdentityModel.Tokens;
@@ -74,6 +76,10 @@ builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 // LDA
 builder.Services.AddScoped<INotificacionRepository, NotificacionRepository>();
 builder.Services.AddScoped<IPdfService, PdfService>();
+
+// EDS
+builder.Services.AddScoped<IInstrumentoRepository, InstrumentoRepository>();
+builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"]

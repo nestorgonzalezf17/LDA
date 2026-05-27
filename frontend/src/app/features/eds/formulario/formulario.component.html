@@ -1,0 +1,124 @@
+<div class="auth-page">
+  <section class="auth-shell">
+    <!-- Panel Izquierdo: Branding Cohesivo (Azul) -->
+    <aside class="auth-brand">
+      <div class="brand-badge">EDS</div>
+
+      <div class="brand-content">
+        <h1>Encuesta de Satisfacción</h1>
+        <p>
+          Completa tus datos sociodemográficos para habilitar el cuestionario de satisfacción.
+        </p>
+      </div>
+
+      <div class="brand-footer">
+        <span>Sistema de Gestión Humana</span>
+      </div>
+    </aside>
+
+    <!-- Panel Derecho: Formulario de Registro -->
+    <main class="auth-panel">
+      <div class="auth-card" *ngIf="loading()">
+        <div class="spinner-container">
+          <div class="spinner-large"></div>
+          <p class="loading-text">Cargando catálogos...</p>
+        </div>
+      </div>
+
+      <form class="auth-card" [formGroup]="form" (ngSubmit)="enviar()" *ngIf="!loading()">
+        <div class="auth-header">
+          <h2>Datos Generales</h2>
+          <p>Por favor completa la información complementaria.</p>
+        </div>
+
+        <!-- Cédula (Lectura) -->
+        <div class="field">
+          <label>Cédula</label>
+          <input type="text" [value]="cedula()" readonly class="input-readonly" />
+        </div>
+
+        <!-- Nombre (Lectura) -->
+        <div class="field">
+          <label>Nombre del Colaborador</label>
+          <input type="text" [value]="nombre()" readonly class="input-readonly" />
+        </div>
+
+        <!-- Cargo (Input) -->
+        <div class="field">
+          <label for="cargo">Cargo</label>
+          <input id="cargo" type="text" formControlName="cargo" placeholder="Ej: Analista de Sistemas" />
+          <small *ngIf="form.controls['cargo'].touched && form.controls['cargo'].invalid">
+            El cargo es obligatorio.
+          </small>
+        </div>
+
+        <!-- Edad (Input) -->
+        <div class="field">
+          <label for="edad">Edad</label>
+          <input id="edad" type="number" formControlName="edad" placeholder="Ej: 30" />
+          <small *ngIf="form.controls['edad'].touched && form.controls['edad'].invalid">
+            La edad es requerida (mayor de 18 años).
+          </small>
+        </div>
+
+        <!-- Estado Civil (Dropdown) -->
+        <div class="field">
+          <label for="idEstadoCivil">Estado Civil</label>
+          <select id="idEstadoCivil" formControlName="idEstadoCivil">
+            <option value="">Selecciona tu estado civil</option>
+            <option *ngFor="let item of estadosCiviles()" [value]="item.id">{{ item.titulo }}</option>
+          </select>
+          <small *ngIf="form.controls['idEstadoCivil'].touched && form.controls['idEstadoCivil'].invalid">
+            El estado civil es requerido.
+          </small>
+        </div>
+
+        <!-- Escolaridad (Dropdown) -->
+        <div class="field">
+          <label for="idEscolaridad">Escolaridad</label>
+          <select id="idEscolaridad" formControlName="idEscolaridad">
+            <option value="">Selecciona tu nivel de escolaridad</option>
+            <option *ngFor="let item of escolaridades()" [value]="item.id">{{ item.titulo }}</option>
+          </select>
+          <small *ngIf="form.controls['idEscolaridad'].touched && form.controls['idEscolaridad'].invalid">
+            La escolaridad es requerida.
+          </small>
+        </div>
+
+        <!-- Área (Dropdown) -->
+        <div class="field">
+          <label for="idArea">Área de Trabajo</label>
+          <select id="idArea" formControlName="idArea">
+            <option value="">Selecciona tu área</option>
+            <option *ngFor="let item of areas()" [value]="item.id">{{ item.titulo }}</option>
+          </select>
+          <small *ngIf="form.controls['idArea'].touched && form.controls['idArea'].invalid">
+            El área es requerida.
+          </small>
+        </div>
+
+        <!-- Empresa (Dropdown) -->
+        <div class="field">
+          <label for="idEmpresa">Empresa</label>
+          <select id="idEmpresa" formControlName="idEmpresa">
+            <option value="">Selecciona la empresa</option>
+            <option *ngFor="let item of empresas()" [value]="item.id">{{ item.titulo }}</option>
+          </select>
+          <small *ngIf="form.controls['idEmpresa'].touched && form.controls['idEmpresa'].invalid">
+            La empresa es requerida.
+          </small>
+        </div>
+
+        <!-- Alertas de Error -->
+        <div class="error fade-in" *ngIf="errorMessage()">
+          {{ errorMessage() }}
+        </div>
+
+        <!-- Botón Continuar (Solo se habilita si el formulario es válido) -->
+        <button class="primary-button" type="submit" [disabled]="form.invalid">
+          Siguiente
+        </button>
+      </form>
+    </main>
+  </section>
+</div>

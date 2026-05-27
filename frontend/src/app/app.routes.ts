@@ -15,6 +15,18 @@ export const routes: Routes = [
     component: LoginComponent
   },
   {
+    path: 'eds/identificacion',
+    loadComponent: () =>
+      import('./features/eds/identificacion/identificacion.component')
+        .then(m => m.IdentificacionComponent)
+  },
+  {
+    path: 'eds/formulario',
+    loadComponent: () =>
+      import('./features/eds/formulario/formulario.component')
+        .then(m => m.FormularioComponent)
+  },
+  {
     path: 'cambiar-password',
     canActivate: [authGuard],
     loadComponent: () =>
