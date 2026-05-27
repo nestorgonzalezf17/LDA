@@ -178,7 +178,7 @@ public class EvaluacionRepository : IEvaluacionRepository
         using var connection = _connectionFactory.CreateConnection();
 
         return await connection.QueryFirstOrDefaultAsync<EmpleadoNominaDto>(
-            "EDS.sp_Empleado_BuscarPorCedulaNomina",
+            "EDD.sp_Empleado_BuscarPorCedulaNomina",
             new
             {
                 CedulaEmpleado = cedulaEmpleado
