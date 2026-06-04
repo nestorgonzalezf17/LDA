@@ -1,0 +1,135 @@
+<div class="survey-page">
+  <div class="survey-shell">
+    
+    <!-- Spinner de Carga -->
+    <div class="loading-container" *ngIf="loading()">
+      <div class="spinner-large"></div>
+      <p>Cargando cuestionario de satisfacción...</p>
+    </div>
+
+    <!-- Cuestionario Cargado -->
+    <div class="survey-card fade-in" *ngIf="!loading() && encuestaTree()">
+      
+      <!-- Encabezado de la Encuesta con progreso -->
+      <header class="survey-header">
+        <div class="header-top">
+          <div class="survey-badge">CUESTIONARIO EDS</div>
+          <div class="step-indicator">
+            Paso {{ pasoActual() + 1 }} de {{ nombresInstrumentos().length }}
+          </div>
+        </div>
+        
+        <h2>{{ instrumentoActual }}</h2>
+        <p class="colaborador-info">Colaborador: <strong>{{ nombre() }}</strong> | Cédula: <strong>{{ cedula() }}</strong></p>
+
+        <!-- Barra de Progreso Visual -->
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="((pasoActual() + 1) / nombresInstrumentos().length) * 100"></div>
+        </div>
+      </header>
+
+      <!-- Mensajes de Error/Validación -->
+      <div class="save-success-banner fade-in" *ngIf="saveSuccess()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>¡Respuestas guardadas de manera temporal con éxito!</span>
+      </div>
+
+      <div class="error-banner fade-in" *ngIf="errorMessage()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+
+      <!-- Cuerpo de la Encuesta (Instrumento actual) -->
+      <div class="survey-body">
+        
+        <!-- Recuadro para cada TipoVaria -->
+        <div class="tipo-varia-card" *ngFor="let tipo of tiposVariaActuales">
+          <h3 class="tipo-varia-title">{{ tipo }}</h3>
+          
+          <!-- Cuadros para cada SubVaria -->
+          <div class="sub-varia-card" *ngFor="let sub of getSubVarias(tipo)">
+            <h4 class="sub-varia-title">{{ sub }}</h4>
+            
+            <!-- Preguntas y Calificaciones -->
+            <div class="question-container" *ngFor="let item of getEnunciados(tipo, sub); let idx = index">
+              <div class="question-header">
+                <span class="question-number">Pregunta</span>
+                <p class="question-text">{{ item.enunciado }}</p>
+              </div>
+
+              <!-- Selector de Calificación de 1 a 10 -->
+              <div class="rating-wrapper">
+                <span class="rating-label-min">Totalmente en desacuerdo (1)</span>
+                
+                <div class="rating-buttons">
+                  <button 
+                    *ngFor="let valor of [1,2,3,4,5,6,7,8,9,10]"
+                    type="button"
+                    class="rating-btn"
+                    [class.selected]="obtenerCalificacion(item.idItem) === valor"
+                    (click)="seleccionarCalificacion(item.idItem, valor)"
+                  >
+                    {{ valor }}
+                  </button>
+                </div>
+
+                <span class="rating-label-max">Totalmente de acuerdo (10)</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Botones de Navegación del Formulario -->
+      <footer class="survey-footer">
+        <button 
+          type="button" 
+          class="secondary-button" 
+          (click)="anteriorPaso()"
+          [disabled]="pasoActual() === 0"
+        >
+          Anterior
+        </button>
+
+        <button 
+          *ngIf="pasoActual() < nombresInstrumentos().length - 1"
+          type="button" 
+          class="primary-button" 
+          (click)="siguientePaso()"
+        >
+          Siguiente Instrumento
+        </button>
+
+        <button 
+          *ngIf="pasoActual() === nombresInstrumentos().length - 1"
+          type="button" 
+          class="success-button" 
+          (click)="finalizar()"
+        >
+          Finalizar Cuestionario
+        </button>
+      </footer>
+
+    </div>
+
+    <!-- Botón Flotante para Guardar Respuestas -->
+    <button type="button" class="floating-save-btn" (click)="guardarRespuestas()" *ngIf="!loading() && respuestas.size > 0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+        <polyline points="7 3 7 8 15 8"></polyline>
+      </svg>
+      Guardar respuestas
+    </button>
+
+  </div>
+</div>

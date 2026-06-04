@@ -92,6 +92,22 @@ BEGIN
 END
 GO
 
+-- Respuesta
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[Respuesta]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [EDS].[Respuesta](
+        [IdRespuesta] [int] IDENTITY(1,1) NOT NULL,
+        [IdFormulario] [int] NOT NULL,
+        [IdItem] [int] NOT NULL,
+        [Calificacion] [int] NULL,
+        CONSTRAINT [PK_Respuesta] PRIMARY KEY CLUSTERED ([IdRespuesta] ASC),
+        CONSTRAINT [UQ_Respuesta_Formulario_Item] UNIQUE NONCLUSTERED ([IdFormulario], [IdItem]),
+        FOREIGN KEY ([IdItem]) REFERENCES [EDS].[ItemSat]([IdItem]),
+        FOREIGN KEY ([IdFormulario]) REFERENCES [EDS].[Formulario]([IdFormulario])
+    );
+END
+GO
+
 -- 3. Inserción de Datos
 
 PRINT 'Insertando en [EDS].[Escolaridad]...';

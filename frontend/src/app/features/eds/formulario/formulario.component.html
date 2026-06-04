@@ -52,12 +52,12 @@
           </small>
         </div>
 
-        <!-- Edad (Input) -->
+        <!-- Fecha de Nacimiento (Input) -->
         <div class="field">
-          <label for="edad">Edad</label>
-          <input id="edad" type="number" formControlName="edad" placeholder="Ej: 30" />
-          <small *ngIf="form.controls['edad'].touched && form.controls['edad'].invalid">
-            La edad es requerida (mayor de 18 años).
+          <label for="fechaDeNacimiento">Fecha de Nacimiento</label>
+          <input id="fechaDeNacimiento" type="date" formControlName="fechaDeNacimiento" />
+          <small *ngIf="form.controls['fechaDeNacimiento'].touched && form.controls['fechaDeNacimiento'].invalid">
+            La fecha de nacimiento es requerida y debes ser mayor de 16 años.
           </small>
         </div>
 

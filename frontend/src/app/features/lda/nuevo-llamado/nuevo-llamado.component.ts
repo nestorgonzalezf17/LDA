@@ -108,7 +108,20 @@ export class NuevoLlamadoComponent implements OnInit {
           this.previewUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
         },
         error: (err) => {
-          this.errorMessage.set('Error al generar la previsualización. Verifique que la relación del hecho tenga una plantilla válida configurada.');
+          if (err.error instanceof Blob) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              try {
+                const errorObj = JSON.parse(reader.result as string);
+                this.errorMessage.set(errorObj.mensaje || 'Error al generar la previsualización.');
+              } catch {
+                this.errorMessage.set('Error al generar la previsualización. Verifique la plantilla.');
+              }
+            };
+            reader.readAsText(err.error);
+          } else {
+            this.errorMessage.set(err.error?.mensaje || err.message || 'Error al generar la previsualización.');
+          }
         }
       });
   }

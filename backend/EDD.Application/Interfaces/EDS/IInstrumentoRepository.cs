@@ -6,5 +6,6 @@ namespace EDD.Application.Interfaces.EDS;
 
 public interface IInstrumentoRepository
 {
-    Task<Dictionary<string, Dictionary<string, Dictionary<string, List<string>>>>> ObtenerArbolPorInstrumentoAsync(int idInst);
+    Task<Dictionary<string, Dictionary<string, Dictionary<string, List<PreguntaDto>>>>> ObtenerArbolPorInstrumentoAsync(int idInst);
+    Task<Dictionary<string, Dictionary<string, Dictionary<string, List<PreguntaDto>>>>> ObtenerArbolCompletoAsync();
 }

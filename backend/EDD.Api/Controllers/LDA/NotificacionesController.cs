@@ -82,9 +82,20 @@ public class NotificacionesController : ControllerBase
         var tipoCarga = System.Linq.Enumerable.FirstOrDefault(tiposCarga, t => t.IdTipoCarga == dto.IdTipoCarga);
         var tipoCargaTitulo = tipoCarga?.TituloTipoCarga ?? string.Empty;
 
+        // Obtener el contenido adaptable para la plantilla (envuelto de forma robusta por si la tabla no existe aún)
+        string? contenidoAdaptable = null;
         try
         {
-            var pdfBytes = await _pdfService.GenerarPdfNotificacionAsync(dto, relacion.RutaPlantilla, tipoCargaTitulo);
+            contenidoAdaptable = await _repository.ObtenerContenidoAdaptablePorRelacionHechoAsync(dto.IdRelacionHecho);
+        }
+        catch (System.Exception ex)
+        {
+            System.Console.WriteLine($"[WARNING] Error al obtener el contenido adaptable de la base de datos: {ex.Message}");
+        }
+
+        try
+        {
+            var pdfBytes = await _pdfService.GenerarPdfNotificacionAsync(dto, relacion.RutaPlantilla, tipoCargaTitulo, contenidoAdaptable);
             return File(pdfBytes, "application/pdf");
         }
         catch (System.IO.FileNotFoundException ex)

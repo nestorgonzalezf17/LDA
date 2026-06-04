@@ -1,0 +1,63 @@
+<div class="auth-page">
+  <section class="auth-shell">
+    <!-- Panel Izquierdo: Branding de EDS -->
+    <aside class="auth-brand">
+      <div class="brand-badge">EDS</div>
+
+      <div class="brand-content">
+        <h1>Encuesta de Satisfacción</h1>
+        <p>
+          Plataforma corporativa para la medición de la satisfacción, el clima organizacional y la cultura de nuestros colaboradores.
+        </p>
+      </div>
+
+      <div class="brand-footer">
+        <span>Sistema de Gestión Humana</span>
+      </div>
+    </aside>
+
+    <!-- Panel Derecho: Reanudar Encuesta -->
+    <main class="auth-panel">
+      <div class="auth-card fade-in" style="text-align: center;">
+        <div class="auth-header">
+          <!-- Icono de en proceso / reloj de arena estetico en amarillo/azul -->
+          <div style="width: 80px; height: 80px; background: rgba(37, 99, 235, 0.1); border: 2px solid #2563eb; border-radius: 50%; display: grid; place-items: center; margin: 0 auto 1.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <h2>Encuesta en Proceso</h2>
+          <p>Usted tiene una encuesta activa y pendiente por responder.</p>
+        </div>
+
+        <!-- Caja de Datos del Colaborador -->
+        <div style="margin: 1.5rem 0; padding: 1.25rem; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0; text-align: left;">
+          <div style="margin-bottom: 0.75rem;">
+            <strong style="display: block; font-size: 0.78rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Colaborador:</strong>
+            <span style="font-size: 1.05rem; font-weight: 700; color: #0f172a;">{{ nombre() }}</span>
+          </div>
+          <div>
+            <strong style="display: block; font-size: 0.78rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Cédula:</strong>
+            <span style="font-size: 1rem; color: #334155; font-family: monospace;">{{ cedula() }}</span>
+          </div>
+        </div>
+
+        <p class="auth-note" style="margin-bottom: 2rem; font-size: 0.92rem; color: #475569;">
+          Puedes reanudar tu encuesta de inmediato y continuar completando las preguntas pendientes desde donde te quedaste.
+        </p>
+
+        <!-- Botones de Acción -->
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <button class="primary-button" type="button" (click)="reanudarEncuesta()">
+            Reanudar Encuesta
+          </button>
+          
+          <button type="button" class="password-toggle" style="width: 100%; min-height: 48px; border: 1px solid #cbd5e1;" (click)="cancelar()">
+            Regresar
+          </button>
+        </div>
+      </div>
+    </main>
+  </section>
+</div>

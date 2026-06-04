@@ -19,17 +19,54 @@ public class PdfService : IPdfService
             ?? throw new System.Exception("LdaSettings:PlantillasPath no está configurado.");
     }
 
-    public async Task<byte[]> GenerarPdfNotificacionAsync(NotificacionSaveDto dto, string rutaPlantilla, string tipoCargaTitulo)
+    public async Task<byte[]> GenerarPdfNotificacionAsync(NotificacionSaveDto dto, string rutaPlantilla, string tipoCargaTitulo, string? contenidoAdaptable = null)
     {
         var fullPath = Path.Combine(Directory.GetCurrentDirectory(), _plantillasPath, rutaPlantilla);
 
         if (!File.Exists(fullPath))
         {
-            throw new FileNotFoundException($"No se encontró la plantilla PDF en la ruta: {fullPath}");
+            // Intentar en backend/PlantillasLDA (si se ejecuta desde el directorio raíz)
+            var alternativePath1 = Path.Combine(Directory.GetCurrentDirectory(), "backend", "PlantillasLDA", rutaPlantilla);
+            if (File.Exists(alternativePath1))
+            {
+                fullPath = alternativePath1;
+            }
+            else
+            {
+                // Intentar en PlantillasLDA del directorio actual
+                var alternativePath2 = Path.Combine(Directory.GetCurrentDirectory(), "PlantillasLDA", rutaPlantilla);
+                if (File.Exists(alternativePath2))
+                {
+                    fullPath = alternativePath2;
+                }
+                else
+                {
+                    throw new FileNotFoundException($"No se encontró la plantilla PDF en la ruta: {fullPath} ni en las rutas alternativas.");
+                }
+            }
         }
 
         try
         {
+            if (!string.IsNullOrEmpty(contenidoAdaptable))
+            {
+                // Reemplazar saltos de línea literales "\n" por saltos de línea reales de C#
+                contenidoAdaptable = contenidoAdaptable.Replace("\\n", "\n").Replace("\\r", "\r");
+
+                // Reemplazar placeholders dinámicos
+                contenidoAdaptable = contenidoAdaptable
+                    .Replace("<FECHA_DE_LOS_HECHOS>", FormatFechaEspanol(dto.FechaHecho))
+                    .Replace("<FECHA_DE_HECHO>", FormatFechaEspanol(dto.FechaHecho))
+                    .Replace("<FECHA_HECHO>", FormatFechaEspanol(dto.FechaHecho))
+                    .Replace("<PLACA>", dto.PlacaVehiculoAsignado ?? "")
+                    .Replace("<PLACA_VEHICULO>", dto.PlacaVehiculoAsignado ?? "")
+                    .Replace("<NOMBRE_EMPLEADO>", dto.NombreCompletoEmpleado ?? "")
+                    .Replace("<NOMBRE_COMPLETO>", dto.NombreCompletoEmpleado ?? "")
+                    .Replace("<CEDULA>", dto.CedulaEmpleado ?? "")
+                    .Replace("<OPERACION>", dto.Operacion ?? "")
+                    .Replace("<REGISTRO>", dto.Registro ?? "");
+            }
+
             // Leemos el archivo a memoria primero para evitar bloqueos de archivo
             byte[] templateBytes = await File.ReadAllBytesAsync(fullPath);
             using var inputStream = new MemoryStream(templateBytes);
@@ -39,7 +76,7 @@ public class PdfService : IPdfService
             using (var pdfWriter = new PdfWriter(outputStream))
             using (var pdfDocument = new PdfDocument(pdfReader, pdfWriter))
             {
-                var form = PdfAcroForm.GetAcroForm(pdfDocument, true);
+                var form = PdfAcroForm.GetAcroForm(pdfDocument, true, new iText.Forms.Fields.Merging.AddIndexStrategy());
                 var fields = form.GetAllFormFields();
 
                 
@@ -99,6 +136,13 @@ public class PdfService : IPdfService
                                 else if (ContainsKeywords("fecha de notificacion", "fecha de notificación", "fechanotificacion")) SetValue(FormatFechaEspanol(System.DateTime.Now));
                                 else if (ContainsKeywords("operacion", "operación")) SetValue(dto.Operacion ?? "");
                                 else if (ContainsKeywords("registro", "reporte", "descripción", "descripcion")) SetValue(dto.Registro ?? "");
+                                else if (ContainsKeywords("contenido"))
+                                {
+                                    var ffObj = widgetDict.Get(PdfName.Ff);
+                                    int currentFlags = ffObj is PdfNumber num ? num.IntValue() : 0;
+                                    widgetDict.Put(PdfName.Ff, new PdfNumber(currentFlags | 4096)); // 4096 es FF_MULTILINE
+                                    SetValue(contenidoAdaptable ?? "");
+                                }
                             }
                         }
                     }
@@ -173,6 +217,14 @@ public class PdfService : IPdfService
                     else if (ContainsKeywords("registro", "reporte", "descripción", "descripcion"))
                     {
                         field.SetValue(dto.Registro ?? "");
+                    }
+                    else if (ContainsKeywords("contenido"))
+                    {
+                        if (field is PdfTextFormField textField)
+                        {
+                            textField.SetMultiline(true);
+                        }
+                        field.SetValue(contenidoAdaptable ?? "");
                     }
                 }
                 }

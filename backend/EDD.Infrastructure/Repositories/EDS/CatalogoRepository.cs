@@ -44,7 +44,7 @@ public class CatalogoRepository : ICatalogoRepository
     {
         using var connection = _connectionFactory.CreateConnection();
         return await connection.QueryAsync<CatalogoDto>(
-            "SELECT IdEmpresaEDS AS Id, NombreE AS Titulo FROM [EDS].[EmpresasEDS] ORDER BY NombreE"
+            "SELECT IdEmpresa AS Id, Nombre AS Titulo FROM [EDD].[Empresas] ORDER BY Nombre"
         );
     }
 }

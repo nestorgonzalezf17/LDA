@@ -20,6 +20,7 @@ BEGIN
         i.[Titulo] AS [TituloInstrumento],
         tv.[Titulo] AS [TituloTipoVaria],
         sv.[Titulo] AS [TituloSubVaria],
+        its.[IdItem] AS [IdItem],
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
@@ -49,6 +50,7 @@ BEGIN
         i.[Titulo] AS [TituloInstrumento],
         tv.[Titulo] AS [TituloTipoVaria],
         sv.[Titulo] AS [TituloSubVaria],
+        its.[IdItem] AS [IdItem],
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]

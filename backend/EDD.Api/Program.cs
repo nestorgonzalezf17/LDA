@@ -80,6 +80,8 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 // EDS
 builder.Services.AddScoped<IInstrumentoRepository, InstrumentoRepository>();
 builder.Services.AddScoped<ICatalogoRepository, CatalogoRepository>();
+builder.Services.AddScoped<IFormularioRepository, FormularioRepository>();
+builder.Services.AddScoped<IRespuestaRepository, RespuestaRepository>();
 
 // JWT
 var jwtKey = builder.Configuration["Jwt:Key"]

@@ -18,7 +18,7 @@ public class InstrumentoRepository : IInstrumentoRepository
         _connectionFactory = connectionFactory;
     }
 
-    public async Task<Dictionary<string, Dictionary<string, Dictionary<string, List<string>>>>> ObtenerArbolPorInstrumentoAsync(int idInst)
+    public async Task<Dictionary<string, Dictionary<string, Dictionary<string, List<PreguntaDto>>>>> ObtenerArbolPorInstrumentoAsync(int idInst)
     {
         using var connection = _connectionFactory.CreateConnection();
 
@@ -41,7 +41,36 @@ public class InstrumentoRepository : IInstrumentoRepository
                             .GroupBy(x => x.TituloSubVaria)
                             .ToDictionary(
                                 gSub => gSub.Key,
-                                gSub => gSub.Select(x => x.Enunciado).ToList()
+                                gSub => gSub.Select(x => new PreguntaDto { IdItem = x.IdItem, Enunciado = x.Enunciado }).ToList()
+                            )
+                    )
+            );
+
+        return tree;
+    }
+
+    public async Task<Dictionary<string, Dictionary<string, Dictionary<string, List<PreguntaDto>>>>> ObtenerArbolCompletoAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var flatData = await connection.QueryAsync<ArbolInstrumentoDto>(
+            "[EDS].[ObtenerArbolCompleto]",
+            commandType: CommandType.StoredProcedure
+        );
+
+        var tree = flatData
+            .GroupBy(x => x.TituloInstrumento)
+            .ToDictionary(
+                gInst => gInst.Key,
+                gInst => gInst
+                    .GroupBy(x => x.TituloTipoVaria)
+                    .ToDictionary(
+                        gTipo => gTipo.Key,
+                        gTipo => gTipo
+                            .GroupBy(x => x.TituloSubVaria)
+                            .ToDictionary(
+                                gSub => gSub.Key,
+                                gSub => gSub.Select(x => new PreguntaDto { IdItem = x.IdItem, Enunciado = x.Enunciado }).ToList()
                             )
                     )
             );

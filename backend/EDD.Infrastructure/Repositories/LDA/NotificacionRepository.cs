@@ -93,4 +93,11 @@ public class NotificacionRepository : INotificacionRepository
         var rowsAffected = await connection.ExecuteAsync(sql, new { Id = id, Registro = registro });
         return rowsAffected > 0;
     }
+
+    public async Task<string?> ObtenerContenidoAdaptablePorRelacionHechoAsync(int idRelacionHecho)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var sql = "SELECT Contenido FROM LDA.TextoAdaptablePlantilla WHERE IdRelacionHecho = @IdRelacionHecho";
+        return await connection.QueryFirstOrDefaultAsync<string>(sql, new { IdRelacionHecho = idRelacionHecho });
+    }
 }

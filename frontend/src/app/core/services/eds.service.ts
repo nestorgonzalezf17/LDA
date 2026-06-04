@@ -29,4 +29,30 @@ export class EdsService {
   obtenerArbol(idInst: number): Observable<any> {
     return this.http.get<any>(`${this.baseUrl}/instrumentos/${idInst}/arbol`);
   }
+
+  verificarCedulaFormularioNomina(cedula: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/formularios/cedula-formulario-nomina/${encodeURIComponent(cedula)}`
+    );
+  }
+
+  guardarFormulario(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/formularios`, payload);
+  }
+
+  obtenerArbolCompleto(): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/instrumentos/arbol-completo`);
+  }
+
+  guardarRespuestas(idFormulario: number, respuestas: { idItem: number, calificacion: number }[]): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/respuestas/bulk`, { idFormulario, respuestas });
+  }
+
+  obtenerRespuestas(idFormulario: number): Observable<{ idItem: number, calificacion: number }[]> {
+    return this.http.get<{ idItem: number, calificacion: number }[]>(`${this.baseUrl}/respuestas/formulario/${idFormulario}`);
+  }
+
+  finalizarFormulario(idFormulario: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/formularios/${idFormulario}/finalizar`, {});
+  }
 }

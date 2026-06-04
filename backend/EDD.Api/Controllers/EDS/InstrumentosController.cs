@@ -28,4 +28,18 @@ public class InstrumentosController : ControllerBase
 
         return Ok(data);
     }
+
+    [HttpGet("arbol-completo")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ObtenerArbolCompleto()
+    {
+        var data = await _repository.ObtenerArbolCompletoAsync();
+
+        if (data == null || data.Count == 0)
+        {
+            return NotFound(new { mensaje = "No se encontró información del árbol de la encuesta." });
+        }
+
+        return Ok(data);
+    }
 }

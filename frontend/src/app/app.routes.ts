@@ -27,6 +27,24 @@ export const routes: Routes = [
         .then(m => m.FormularioComponent)
   },
   {
+    path: 'eds/encuesta',
+    loadComponent: () =>
+      import('./features/eds/encuesta/encuesta-eds.component')
+        .then(m => m.EncuestaComponent)
+  },
+  {
+    path: 'eds/encuesta/terminada',
+    loadComponent: () =>
+      import('./features/eds/encuesta-terminada/encuesta-terminada.component')
+        .then(m => m.EncuestaTermizadaComponent)
+  },
+  {
+    path: 'eds/encuesta/proceso',
+    loadComponent: () =>
+      import('./features/eds/encuesta-proceso/encuesta-proceso.component')
+        .then(m => m.EncuestaProcesoComponent)
+  },
+  {
     path: 'cambiar-password',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -48,30 +66,30 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/admin/areas/areas.component').then(m => m.AreasComponent)
-        },
+          import('./features/admin/areas/areas.component').then(m => m.AreasComponent)
+      },
       {
         path: 'admin/cargos',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/admin/cargos/cargos.component').then(m => m.CargosComponent)
-        },
-        {
+          import('./features/admin/cargos/cargos.component').then(m => m.CargosComponent)
+      },
+      {
         path: 'admin/usuarios-modulo',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/admin/usuarios-modulo/usuarios-modulo.component').then(m => m.UsuariosModuloComponent)
-        },
-        {
+          import('./features/admin/usuarios-modulo/usuarios-modulo.component').then(m => m.UsuariosModuloComponent)
+      },
+      {
         path: 'admin/items-cargo',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/admin/items-cargo/items-cargo.component').then(m => m.ItemsCargoComponent)
-        },
-        {
+          import('./features/admin/items-cargo/items-cargo.component').then(m => m.ItemsCargoComponent)
+      },
+      {
         path: 'admin/empresas',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
@@ -83,37 +101,37 @@ export const routes: Routes = [
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'EVALUADOR'] },
         loadComponent: () =>
-            import('./features/evaluaciones/nueva-evaluacion/nueva-evaluacion.component').then(m => m.NuevaEvaluacionComponent)
-        },
-        {
+          import('./features/evaluaciones/nueva-evaluacion/nueva-evaluacion.component').then(m => m.NuevaEvaluacionComponent)
+      },
+      {
         path: 'evaluaciones/listado',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'EVALUADOR'] },
         loadComponent: () =>
-            import('./features/evaluaciones/listado-evaluaciones/listado-evaluaciones.component').then(m => m.ListadoEvaluacionesComponent)
-        },
-        {
+          import('./features/evaluaciones/listado-evaluaciones/listado-evaluaciones.component').then(m => m.ListadoEvaluacionesComponent)
+      },
+      {
         path: 'evaluaciones/detalle/:id',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN', 'EVALUADOR'] },
         loadComponent: () =>
-            import('./features/evaluaciones/detalle-evaluacion/detalle-evaluacion.component').then(m => m.DetalleEvaluacionComponent)
-        },
-        {
+          import('./features/evaluaciones/detalle-evaluacion/detalle-evaluacion.component').then(m => m.DetalleEvaluacionComponent)
+      },
+      {
         path: 'reportes/areas',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/reportes/reporte-areas/reporte-areas.component').then(m => m.ReporteAreasComponent)
-        },
-        {
+          import('./features/reportes/reporte-areas/reporte-areas.component').then(m => m.ReporteAreasComponent)
+      },
+      {
         path: 'reportes/empleados',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
         loadComponent: () =>
-            import('./features/reportes/reporte-empleado/reporte-empleado.component').then(m => m.ReporteEmpleadoComponent)
-        },
-        {
+          import('./features/reportes/reporte-empleado/reporte-empleado.component').then(m => m.ReporteEmpleadoComponent)
+      },
+      {
         path: 'admin/carga-masiva',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },
@@ -134,7 +152,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/lda/listado-notificaciones/listado-notificaciones.component').then(m => m.ListadoNotificacionesComponent)
       }
-        
+
     ]
   },
   {

@@ -21,4 +21,5 @@ public interface INotificacionRepository
 
     Task<int> CrearAsync(NotificacionSaveDto dto);
     Task<bool> ActualizarRegistroAsync(int id, string registro);
+    Task<string?> ObtenerContenidoAdaptablePorRelacionHechoAsync(int idRelacionHecho);
 }

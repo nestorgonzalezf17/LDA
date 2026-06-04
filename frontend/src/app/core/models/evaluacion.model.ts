@@ -115,3 +115,13 @@ export interface EmpleadoNomina {
   apellidosEmpleado: string;
   cedulaEmpleado: string;
 }
+
+export interface FormularioNominaCheckResult {
+  existeEnFormulario: boolean;
+  idFormulario?: number;
+  cedula?: string;
+  nombre?: string;
+  realizada?: boolean;
+  mensaje?: string;
+  empleadoNomina?: EmpleadoNomina;
+}

@@ -33,7 +33,20 @@ export class FormularioComponent implements OnInit {
   constructor() {
     // Obtener parámetros de navegación anteriores
     const navigation = this.router.getCurrentNavigation();
-    const state = navigation?.extras.state as { cedula: string; nombre: string };
+    const state = navigation?.extras.state as { 
+      cedula: string; 
+      nombre: string;
+      formularioAnterior?: {
+        cargo: string;
+        fechaDeNacimiento: string;
+        idEstadoCivil: number;
+        idestadoCivil: number;
+        idEscolaridad: number;
+        idArea: number;
+        idEmpresa: number;
+        idempresa: number;
+      }
+    };
 
     if (!state || !state.cedula) {
       // Redirigir al inicio si se ingresa de forma directa
@@ -43,14 +56,27 @@ export class FormularioComponent implements OnInit {
       this.nombre.set(state.nombre);
     }
 
+    const fa = state?.formularioAnterior;
     this.form = this.fb.group({
-      cargo: ['', [Validators.required]],
-      edad: ['', [Validators.required, Validators.min(18), Validators.max(100)]],
-      idEstadoCivil: ['', [Validators.required]],
-      idEscolaridad: ['', [Validators.required]],
-      idArea: ['', [Validators.required]],
-      idEmpresa: ['', [Validators.required]]
+      cargo: [fa?.cargo || '', [Validators.required]],
+      fechaDeNacimiento: [fa?.fechaDeNacimiento ? fa.fechaDeNacimiento.split('T')[0] : '', [Validators.required, this.validarMayoriaEdad.bind(this)]],
+      idEstadoCivil: [fa?.idEstadoCivil || fa?.idestadoCivil || '', [Validators.required]],
+      idEscolaridad: [fa?.idEscolaridad || '', [Validators.required]],
+      idArea: [fa?.idArea || '', [Validators.required]],
+      idEmpresa: [fa?.idEmpresa || fa?.idempresa || '', [Validators.required]]
     });
+  }
+
+  validarMayoriaEdad(control: any) {
+    if (!control.value) return null;
+    const fechaNac = new Date(control.value);
+    const hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
+    const mes = hoy.getMonth() - fechaNac.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+      edad--;
+    }
+    return edad >= 16 ? null : { menorDeEdad: true };
   }
 
   ngOnInit(): void {
@@ -77,13 +103,44 @@ export class FormularioComponent implements OnInit {
   enviar(): void {
     if (this.form.invalid) return;
 
-    const datosFormulario = {
+    this.loading.set(true);
+    this.errorMessage.set('');
+
+    const payload = {
       cedula: this.cedula(),
-      nombre: this.nombre(),
-      ...this.form.value
+      cargo: this.form.value.cargo,
+      fechaDeNacimiento: this.form.value.fechaDeNacimiento,
+      idEstadoCivil: Number(this.form.value.idEstadoCivil),
+      idEscolaridad: Number(this.form.value.idEscolaridad),
+      idArea: Number(this.form.value.idArea),
+      idEmpresa: Number(this.form.value.idEmpresa)
     };
 
-    // Redirección al componente de la evaluación pasándole toda la información
-    this.router.navigate(['/eds/proceso'], { state: datosFormulario });
+    this.edsService.guardarFormulario(payload)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (res) => {
+          // El backend nos retorna el objeto FormularioSaveResultDto con idFormulario
+          const datosNavigation = {
+            idFormulario: res.idFormulario,
+            cedula: this.cedula(),
+            nombre: this.nombre(),
+            cargo: res.cargo,
+            fechaDeNacimiento: res.fechaDeNacimiento,
+            idEstadoCivil: res.idEstadoCivil,
+            idEscolaridad: res.idEscolaridad,
+            idArea: res.idArea,
+            idEmpresa: res.idEmpresa,
+            mensaje: res.mensaje,
+            yaRegistrado: res.yaRegistrado
+          };
+
+          // Redirección al componente de la evaluación pasándole toda la información
+          this.router.navigate(['/eds/encuesta'], { state: datosNavigation });
+        },
+        error: (err) => {
+          this.errorMessage.set(err.error?.mensaje || 'Ocurrió un error al guardar tus datos sociodemográficos.');
+        }
+      });
   }
 }

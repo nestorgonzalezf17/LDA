@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EvaluacionesService } from '../../../core/services/evaluaciones.service';
+import { EdsService } from '../../../core/services/eds.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -15,13 +15,14 @@ import { finalize } from 'rxjs';
 export class IdentificacionComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
-  private readonly evaluacionesService = inject(EvaluacionesService);
+  private readonly edsService = inject(EdsService);
 
   form: FormGroup;
   buscando = signal(false);
   empleadoValido = signal(false);
   nombreCompleto = signal('');
   errorMessage = signal('');
+  formularioAnterior: any = null;
 
   constructor() {
     this.form = this.fb.group({
@@ -40,16 +41,38 @@ export class IdentificacionComponent {
     this.errorMessage.set('');
     this.empleadoValido.set(false);
     this.nombreCompleto.set('');
+    this.formularioAnterior = null;
 
-    this.evaluacionesService.buscarEmpleadoNominaPorCedula(cedula)
+    this.edsService.verificarCedulaFormularioNomina(cedula)
       .pipe(finalize(() => this.buscando.set(false)))
       .subscribe({
-        next: (emp) => {
-          this.nombreCompleto.set(`${emp.nombresEmpleado} ${emp.apellidosEmpleado}`);
-          this.empleadoValido.set(true);
+        next: (res) => {
+          if (res.existeEnFormulario) {
+            if (res.realizada) {
+              this.errorMessage.set(res.mensaje || 'usted ya realizo la encuesta');
+              // Llevar a la ruta de terminada
+              this.router.navigate(['/eds/encuesta/terminada']);
+            } else {
+              // Llevar a la ruta de proceso
+              this.router.navigate(['/eds/encuesta/proceso'], {
+                state: {
+                  idFormulario: res.idFormulario,
+                  cedula: res.cedula,
+                  nombre: res.nombre
+                }
+              });
+            }
+          } else {
+            // Existe en nomina pero no en la tabla formulario. Habilitamos flujo normal.
+            this.nombreCompleto.set(res.nombre || '');
+            this.formularioAnterior = res.formularioAnterior;
+            this.empleadoValido.set(true);
+          }
         },
         error: (err) => {
-          this.errorMessage.set(err.error?.mensaje || 'No se encontró el empleado en la nómina, o se encuentra inactivo.');
+          this.errorMessage.set(
+            err.error?.mensaje || 'No se encuentra registrado, revise su cedula o pongase en contacto usted puede estar inactivo.'
+          );
           this.empleadoValido.set(false);
         }
       });
@@ -58,8 +81,13 @@ export class IdentificacionComponent {
   continuar(): void {
     if (this.empleadoValido()) {
       const cedula = this.form.get('cedula')?.value;
-      // Redirección al siguiente componente que se creará más adelante (pasando la cédula en el state)
-      this.router.navigate(['/eds/formulario'], { state: { cedula, nombre: this.nombreCompleto() } });
+      this.router.navigate(['/eds/formulario'], { 
+        state: { 
+          cedula, 
+          nombre: this.nombreCompleto(),
+          formularioAnterior: this.formularioAnterior
+        } 
+      });
     }
   }
 }
