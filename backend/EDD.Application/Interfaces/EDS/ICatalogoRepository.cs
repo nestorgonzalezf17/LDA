@@ -10,4 +10,5 @@ public interface ICatalogoRepository
     Task<IEnumerable<CatalogoDto>> ListarEscolaridadesAsync();
     Task<IEnumerable<CatalogoDto>> ListarAreasAsync();
     Task<IEnumerable<CatalogoDto>> ListarEmpresasAsync();
+    Task<IEnumerable<CatalogoDto>> ListarInstrumentosAsync();
 }

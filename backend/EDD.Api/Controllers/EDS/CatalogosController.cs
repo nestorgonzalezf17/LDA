@@ -22,13 +22,15 @@ public class CatalogosController : ControllerBase
         var escolaridades = await _repository.ListarEscolaridadesAsync();
         var areas = await _repository.ListarAreasAsync();
         var empresas = await _repository.ListarEmpresasAsync();
+        var instrumentos = await _repository.ListarInstrumentosAsync();
 
         return Ok(new
         {
             estadosCiviles,
             escolaridades,
             areas,
-            empresas
+            empresas,
+            instrumentos
         });
     }
 }

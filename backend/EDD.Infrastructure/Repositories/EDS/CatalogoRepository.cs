@@ -47,4 +47,12 @@ public class CatalogoRepository : ICatalogoRepository
             "SELECT IdEmpresa AS Id, Nombre AS Titulo FROM [EDD].[Empresas] ORDER BY Nombre"
         );
     }
+
+    public async Task<IEnumerable<CatalogoDto>> ListarInstrumentosAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        return await connection.QueryAsync<CatalogoDto>(
+            "SELECT IdInst AS Id, Titulo FROM [EDS].[Instrumento] ORDER BY Titulo"
+        );
+    }
 }

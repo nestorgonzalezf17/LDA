@@ -144,11 +144,11 @@ sql = []
 # Encabezado
 sql.append("""/*
     SCRIPT DE GENERACIÓN DE ESQUEMA Y DATOS EDS
-    Base de Datos: solucion1
+    Base de Datos: GTHS
     Generado automáticamente desde script de Python.
 */
 
-USE [solucion1];
+USE [GTHS];
 GO
 
 -- 1. Crear el esquema EDS si no existe
@@ -214,10 +214,10 @@ BEGIN
 END
 GO
 
--- SubVar
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[SubVar]') AND type in (N'U'))
+-- SubVariable
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[SubVariable]') AND type in (N'U'))
 BEGIN
-    CREATE TABLE [EDS].[SubVar](
+    CREATE TABLE [EDS].[SubVariable](
         [IdSuVa] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [IdTiVa] [int] NOT NULL,
         [Titulo] [nvarchar](200) NOT NULL,
@@ -233,7 +233,7 @@ BEGIN
         [IdItem] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [IdSubVaria] [int] NOT NULL,
         [Enunciado] [nvarchar](MAX) NOT NULL,
-        FOREIGN KEY ([IdSubVaria]) REFERENCES [EDS].[SubVar]([IdSuVa])
+        FOREIGN KEY ([IdSubVaria]) REFERENCES [EDS].[SubVariable]([IdSuVa])
     );
 END
 GO
@@ -287,13 +287,13 @@ for (id_inst, val), idx in sorted(tipo_varias.items(), key=lambda x: x[1]):
     sql.append(f"    INSERT INTO [EDS].[TipoVaria] ([IdTiVa], [IdInst], [Titulo]) VALUES ({idx}, {id_inst}, '{escape_sql(val)}');")
 sql.append("SET IDENTITY_INSERT [EDS].[TipoVaria] OFF;\nGO\n")
 
-# Insertar SubVar
-sql.append("PRINT 'Insertando en [EDS].[SubVar]...';")
-sql.append("SET IDENTITY_INSERT [EDS].[SubVar] ON;")
+# Insertar SubVariable
+sql.append("PRINT 'Insertando en [EDS].[SubVariable]...';")
+sql.append("SET IDENTITY_INSERT [EDS].[SubVariable] ON;")
 for (id_tiva, val), idx in sorted(sub_vars.items(), key=lambda x: x[1]):
-    sql.append(f"IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = {idx})")
-    sql.append(f"    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES ({idx}, {id_tiva}, '{escape_sql(val)}');")
-sql.append("SET IDENTITY_INSERT [EDS].[SubVar] OFF;\nGO\n")
+    sql.append(f"IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = {idx})")
+    sql.append(f"    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES ({idx}, {id_tiva}, '{escape_sql(val)}');")
+sql.append("SET IDENTITY_INSERT [EDS].[SubVariable] OFF;\nGO\n")
 
 # Insertar ItemSat
 sql.append("PRINT 'Insertando en [EDS].[ItemSat]...';")
@@ -328,7 +328,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE (@IdInst IS NULL OR i.[IdInst] = @IdInst)
       AND (@IdTiVa IS NULL OR tv.[IdTiVa] = @IdTiVa)
@@ -355,7 +355,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE i.[IdInst] = @IdInst
     ORDER BY tv.[IdTiVa], sv.[IdSuVa], its.[IdItem];
@@ -380,7 +380,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE tv.[IdTiVa] = @IdTiVa
     ORDER BY sv.[IdSuVa], its.[IdItem];
@@ -405,7 +405,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE sv.[IdSuVa] = @IdSuVa
     ORDER BY its.[IdItem];

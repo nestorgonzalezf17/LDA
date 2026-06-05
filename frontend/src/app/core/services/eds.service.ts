@@ -13,6 +13,7 @@ export interface EdsCatalogos {
   escolaridades: CatalogoItem[];
   areas: CatalogoItem[];
   empresas: CatalogoItem[];
+  instrumentos: CatalogoItem[];
 }
 
 @Injectable({
@@ -54,5 +55,9 @@ export class EdsService {
 
   finalizarFormulario(idFormulario: number): Observable<any> {
     return this.http.post<any>(`${this.baseUrl}/formularios/${idFormulario}/finalizar`, {});
+  }
+
+  obtenerReportePromedios(filtro: { idAreas: number[], idInst: number | null, anioInicio: number, anioFin: number }): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/respuestas/reporte`, filtro);
   }
 }

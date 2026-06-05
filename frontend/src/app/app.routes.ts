@@ -132,6 +132,13 @@ export const routes: Routes = [
           import('./features/reportes/reporte-empleado/reporte-empleado.component').then(m => m.ReporteEmpleadoComponent)
       },
       {
+        path: 'reportes/eds-dashboard',
+        canActivate: [roleGuard],
+        data: { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/eds/dashboard/dashboard-eds.component').then(m => m.DashboardEdsComponent)
+      },
+      {
         path: 'admin/carga-masiva',
         canActivate: [roleGuard],
         data: { roles: ['ADMIN'] },

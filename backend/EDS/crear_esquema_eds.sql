@@ -68,10 +68,10 @@ BEGIN
 END
 GO
 
--- SubVar
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[SubVar]') AND type in (N'U'))
+-- SubVariable
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[SubVariable]') AND type in (N'U'))
 BEGIN
-    CREATE TABLE [EDS].[SubVar](
+    CREATE TABLE [EDS].[SubVariable](
         [IdSuVa] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [IdTiVa] [int] NOT NULL,
         [Titulo] [nvarchar](200) NOT NULL,
@@ -87,23 +87,7 @@ BEGIN
         [IdItem] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
         [IdSubVaria] [int] NOT NULL,
         [Enunciado] [nvarchar](MAX) NOT NULL,
-        FOREIGN KEY ([IdSubVaria]) REFERENCES [EDS].[SubVar]([IdSuVa])
-    );
-END
-GO
-
--- Respuesta
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[EDS].[Respuesta]') AND type in (N'U'))
-BEGIN
-    CREATE TABLE [EDS].[Respuesta](
-        [IdRespuesta] [int] IDENTITY(1,1) NOT NULL,
-        [IdFormulario] [int] NOT NULL,
-        [IdItem] [int] NOT NULL,
-        [Calificacion] [int] NULL,
-        CONSTRAINT [PK_Respuesta] PRIMARY KEY CLUSTERED ([IdRespuesta] ASC),
-        CONSTRAINT [UQ_Respuesta_Formulario_Item] UNIQUE NONCLUSTERED ([IdFormulario], [IdItem]),
-        FOREIGN KEY ([IdItem]) REFERENCES [EDS].[ItemSat]([IdItem]),
-        FOREIGN KEY ([IdFormulario]) REFERENCES [EDS].[Formulario]([IdFormulario])
+        FOREIGN KEY ([IdSubVaria]) REFERENCES [EDS].[SubVariable]([IdSuVa])
     );
 END
 GO
@@ -223,75 +207,75 @@ IF NOT EXISTS (SELECT 1 FROM [EDS].[TipoVaria] WHERE [IdTiVa] = 13)
 SET IDENTITY_INSERT [EDS].[TipoVaria] OFF;
 GO
 
-PRINT 'Insertando en [EDS].[SubVar]...';
-SET IDENTITY_INSERT [EDS].[SubVar] ON;
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 1)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (1, 1, 'Comunicación Organizacional');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 2)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (2, 1, 'Alineación y Procesos');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 3)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (3, 1, 'Aprendizaje');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 4)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (4, 1, 'Direccionamiento y Orientación a Resultados');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 5)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (5, 1, 'Servicio al Cliente');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 6)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (6, 2, 'Reconocimiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 7)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (7, 2, 'Aprendizaje y Desarrollo');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 8)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (8, 2, 'Retroalimentación y Seguimiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 9)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (9, 3, 'Liderazgo Organizacional');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 10)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (10, 4, 'Clientes');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 11)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (11, 4, 'Derechos Humanos');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 12)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (12, 4, 'Medio Ambiente');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 13)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (13, 4, 'Rendición de Cuentas');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 14)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (14, 4, 'Sociedad');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 15)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (15, 5, 'Ambiente Estimulante');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 16)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (16, 5, 'Balance Vida Personal y Laboral');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 17)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (17, 5, 'Bienestar');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 18)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (18, 5, 'Posicionamiento y Orgullo');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 19)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (19, 5, 'Satisfacción con el Cargo');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 20)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (20, 6, 'Valores');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 21)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (21, 7, 'Direccionamiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 22)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (22, 7, 'Inspirar');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 23)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (23, 8, 'Apoyo y Acompañamiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 24)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (24, 8, 'Roles');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 25)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (25, 8, 'Seguimiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 26)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (26, 9, 'Desarrollo');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 27)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (27, 9, 'Motivación y Reconocimiento');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 28)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (28, 9, 'Retroalimentar');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 29)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (29, 10, 'Comunicación');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 30)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (30, 10, 'Relaciones');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 31)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (31, 11, 'Planeación y Objetivos');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 32)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (32, 12, 'Roles');
-IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVar] WHERE [IdSuVa] = 33)
-    INSERT INTO [EDS].[SubVar] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (33, 13, 'Toma de Decisiones');
-SET IDENTITY_INSERT [EDS].[SubVar] OFF;
+PRINT 'Insertando en [EDS].[SubVariable]...';
+SET IDENTITY_INSERT [EDS].[SubVariable] ON;
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 1)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (1, 1, 'Comunicación Organizacional');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 2)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (2, 1, 'Alineación y Procesos');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 3)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (3, 1, 'Aprendizaje');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 4)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (4, 1, 'Direccionamiento y Orientación a Resultados');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 5)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (5, 1, 'Servicio al Cliente');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 6)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (6, 2, 'Reconocimiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 7)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (7, 2, 'Aprendizaje y Desarrollo');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 8)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (8, 2, 'Retroalimentación y Seguimiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 9)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (9, 3, 'Liderazgo Organizacional');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 10)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (10, 4, 'Clientes');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 11)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (11, 4, 'Derechos Humanos');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 12)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (12, 4, 'Medio Ambiente');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 13)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (13, 4, 'Rendición de Cuentas');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 14)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (14, 4, 'Sociedad');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 15)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (15, 5, 'Ambiente Estimulante');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 16)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (16, 5, 'Balance Vida Personal y Laboral');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 17)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (17, 5, 'Bienestar');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 18)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (18, 5, 'Posicionamiento y Orgullo');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 19)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (19, 5, 'Satisfacción con el Cargo');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 20)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (20, 6, 'Valores');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 21)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (21, 7, 'Direccionamiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 22)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (22, 7, 'Inspirar');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 23)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (23, 8, 'Apoyo y Acompañamiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 24)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (24, 8, 'Roles');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 25)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (25, 8, 'Seguimiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 26)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (26, 9, 'Desarrollo');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 27)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (27, 9, 'Motivación y Reconocimiento');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 28)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (28, 9, 'Retroalimentar');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 29)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (29, 10, 'Comunicación');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 30)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (30, 10, 'Relaciones');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 31)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (31, 11, 'Planeación y Objetivos');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 32)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (32, 12, 'Roles');
+IF NOT EXISTS (SELECT 1 FROM [EDS].[SubVariable] WHERE [IdSuVa] = 33)
+    INSERT INTO [EDS].[SubVariable] ([IdSuVa], [IdTiVa], [Titulo]) VALUES (33, 13, 'Toma de Decisiones');
+SET IDENTITY_INSERT [EDS].[SubVariable] OFF;
 GO
 
 PRINT 'Insertando en [EDS].[ItemSat]...';
@@ -494,7 +478,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE (@IdInst IS NULL OR i.[IdInst] = @IdInst)
       AND (@IdTiVa IS NULL OR tv.[IdTiVa] = @IdTiVa)
@@ -521,7 +505,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE i.[IdInst] = @IdInst
     ORDER BY tv.[IdTiVa], sv.[IdSuVa], its.[IdItem];
@@ -546,7 +530,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE tv.[IdTiVa] = @IdTiVa
     ORDER BY sv.[IdSuVa], its.[IdItem];
@@ -571,7 +555,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE sv.[IdSuVa] = @IdSuVa
     ORDER BY its.[IdItem];

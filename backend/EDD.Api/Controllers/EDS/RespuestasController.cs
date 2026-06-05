@@ -42,4 +42,22 @@ public class RespuestasController : ControllerBase
         var data = await _repository.ObtenerRespuestasPorFormularioAsync(idFormulario);
         return Ok(data);
     }
+
+    [HttpPost("reporte")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ObtenerReportePromedios([FromBody] ReporteFiltroDto filtro)
+    {
+        if (filtro == null)
+        {
+            return BadRequest(new { mensaje = "Filtros inválidos." });
+        }
+
+        if (filtro.AnioInicio > filtro.AnioFin)
+        {
+            return BadRequest(new { mensaje = "El año inicial no puede ser mayor al año final." });
+        }
+
+        var resultado = await _repository.ObtenerReportePromediosAsync(filtro);
+        return Ok(resultado);
+    }
 }

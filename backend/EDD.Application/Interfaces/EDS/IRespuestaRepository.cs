@@ -8,4 +8,5 @@ public interface IRespuestaRepository
 {
     Task GuardarRespuestasBulkAsync(GuardarRespuestasBulkDto dto);
     Task<IEnumerable<RespuestaObtenidaDto>> ObtenerRespuestasPorFormularioAsync(int idFormulario);
+    Task<IEnumerable<ReportePromedioDto>> ObtenerReportePromediosAsync(ReporteFiltroDto filtro);
 }

@@ -22,11 +22,21 @@ public class InstrumentoRepository : IInstrumentoRepository
     {
         using var connection = _connectionFactory.CreateConnection();
 
-        var flatData = await connection.QueryAsync<ArbolInstrumentoDto>(
-            "[EDS].[ObtenerArbolPorInstrumento]",
-            new { IdInst = idInst },
-            commandType: CommandType.StoredProcedure
-        );
+        const string sql = @"
+            SELECT 
+                i.[Titulo] AS [TituloInstrumento],
+                tv.[Titulo] AS [TituloTipoVaria],
+                sv.[Titulo] AS [TituloSubVaria],
+                its.[IdItem] AS [IdItem],
+                its.[Enunciado]
+            FROM [EDS].[Instrumento] i
+            INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
+            INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+            INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
+            WHERE i.[IdInst] = @IdInst
+            ORDER BY tv.[IdTiVa], sv.[IdSuVa], its.[IdItem]";
+
+        var flatData = await connection.QueryAsync<ArbolInstrumentoDto>(sql, new { IdInst = idInst });
 
         // Agrupación jerárquica con LINQ: instrumento -> TipoVaria -> SubVaria -> Enunciados
         var tree = flatData
@@ -53,10 +63,20 @@ public class InstrumentoRepository : IInstrumentoRepository
     {
         using var connection = _connectionFactory.CreateConnection();
 
-        var flatData = await connection.QueryAsync<ArbolInstrumentoDto>(
-            "[EDS].[ObtenerArbolCompleto]",
-            commandType: CommandType.StoredProcedure
-        );
+        const string sql = @"
+            SELECT 
+                i.[Titulo] AS [TituloInstrumento],
+                tv.[Titulo] AS [TituloTipoVaria],
+                sv.[Titulo] AS [TituloSubVaria],
+                its.[IdItem] AS [IdItem],
+                its.[Enunciado]
+            FROM [EDS].[Instrumento] i
+            INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
+            INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+            INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
+            ORDER BY i.[IdInst], tv.[IdTiVa], sv.[IdSuVa], its.[IdItem]";
+
+        var flatData = await connection.QueryAsync<ArbolInstrumentoDto>(sql);
 
         var tree = flatData
             .GroupBy(x => x.TituloInstrumento)

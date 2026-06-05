@@ -1,4 +1,4 @@
-USE [solucion1];
+USE [GTHS];
 GO
 
 -- =================================================================================
@@ -24,7 +24,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE (@IdInst IS NULL OR i.[IdInst] = @IdInst)
       AND (@IdTiVa IS NULL OR tv.[IdTiVa] = @IdTiVa)
@@ -54,7 +54,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE i.[IdInst] = @IdInst
     ORDER BY tv.[IdTiVa], sv.[IdSuVa], its.[IdItem];
@@ -81,7 +81,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE tv.[IdTiVa] = @IdTiVa
     ORDER BY sv.[IdSuVa], its.[IdItem];
@@ -108,7 +108,7 @@ BEGIN
         its.[Enunciado]
     FROM [EDS].[Instrumento] i
     INNER JOIN [EDS].[TipoVaria] tv ON i.[IdInst] = tv.[IdInst]
-    INNER JOIN [EDS].[SubVar] sv ON tv.[IdTiVa] = sv.[IdTiVa]
+    INNER JOIN [EDS].[SubVariable] sv ON tv.[IdTiVa] = sv.[IdTiVa]
     INNER JOIN [EDS].[ItemSat] its ON sv.[IdSuVa] = its.[IdSubVaria]
     WHERE sv.[IdSuVa] = @IdSuVa
     ORDER BY its.[IdItem];
