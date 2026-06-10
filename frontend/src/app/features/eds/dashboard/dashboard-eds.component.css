@@ -695,3 +695,39 @@
     text-align: center;
   }
 }
+
+/* Nuevas gráficas de barras */
+.chart-bar-area {
+  transition: all 0.25s ease;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.chart-bar-area:hover {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
+.chart-bar-grouped {
+  transition: all 0.25s ease;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.chart-bar-grouped:hover {
+  opacity: 1;
+  filter: brightness(1.1);
+}
+
+.axis-label-x-truncated {
+  font-size: 0.7rem;
+  fill: #64748b;
+  font-weight: 700;
+  text-anchor: middle;
+  cursor: help;
+}
+
+.full-width-card {
+  margin-top: 1.5rem;
+}
+

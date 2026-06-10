@@ -23,6 +23,7 @@ public class CatalogosController : ControllerBase
         var areas = await _repository.ListarAreasAsync();
         var empresas = await _repository.ListarEmpresasAsync();
         var instrumentos = await _repository.ListarInstrumentosAsync();
+        var anios = await _repository.ListarAniosEncuestasAsync();
 
         return Ok(new
         {
@@ -30,7 +31,8 @@ public class CatalogosController : ControllerBase
             escolaridades,
             areas,
             empresas,
-            instrumentos
+            instrumentos,
+            anios
         });
     }
 }

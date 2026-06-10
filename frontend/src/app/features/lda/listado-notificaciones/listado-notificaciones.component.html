@@ -4,9 +4,14 @@
       <h2>Listado de llamados de atención (LDA)</h2>
       <p>Consulta los llamados de atención registrados y descarga sus documentos PDF.</p>
     </div>
-    <button type="button" class="success" (click)="irANuevo()">
-      Nuevo Llamado
-    </button>
+    <div class="header-actions" style="display: flex; gap: 0.5rem;">
+      <button type="button" class="secondary" (click)="exportarAExcel()" [disabled]="notificaciones().length === 0">
+        Descargar Excel
+      </button>
+      <button type="button" class="success" (click)="irANuevo()">
+        Nuevo Llamado
+      </button>
+    </div>
   </div>
 
   <section class="card filtros-card">

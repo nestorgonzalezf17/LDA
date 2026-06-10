@@ -65,13 +65,13 @@
         <div class="year-range">
           <div class="select-wrapper">
             <select [value]="anioInicio()" (change)="changeAnioInicio($event)">
-              <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+              <option *ngFor="let anio of aniosDisponibles()" [value]="anio">{{ anio }}</option>
             </select>
           </div>
           <span class="range-divider">a</span>
           <div class="select-wrapper">
             <select [value]="anioFin()" (change)="changeAnioFin($event)">
-              <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+              <option *ngFor="let anio of aniosDisponibles()" [value]="anio">{{ anio }}</option>
             </select>
           </div>
         </div>
@@ -111,8 +111,8 @@
   <ng-container *ngIf="!loadingReport() && reportData().length > 0">
     <div class="dashboard-main-grid">
       
-      <!-- Panel del Gráfico -->
-      <section class="card chart-card">
+      <!-- Panel del Gráfico (Historial de Tendencia - Rango Multi-anual) -->
+      <section class="card chart-card" *ngIf="!isSingleYear()">
         <div class="card-header">
           <div>
             <h4>Tendencia Histórica</h4>
@@ -222,6 +222,99 @@
         </div>
       </section>
 
+      <!-- Panel del Gráfico (Comparación por Áreas - Unianual) -->
+      <section class="card chart-card" *ngIf="isSingleYear()">
+        <div class="card-header">
+          <div>
+            <h4>Comparación por Áreas (Año {{ anioInicio() }})</h4>
+            <p>Calificaciones promedio de clima laboral por departamento.</p>
+          </div>
+        </div>
+
+        <div class="chart-container" *ngIf="areaChartConfig() as config">
+          <svg [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height" class="svg-chart-element">
+            <!-- Grid Lines -->
+            <g>
+              <line 
+                *ngFor="let line of config.gridLines" 
+                [attr.x1]="config.paddingLeft" 
+                [attr.y1]="line.y" 
+                [attr.x2]="config.width - 30" 
+                [attr.y2]="line.y" 
+                class="grid-line"
+              />
+              <text 
+                *ngFor="let line of config.gridLines" 
+                [attr.x]="config.paddingLeft - 12" 
+                [attr.y]="line.y + 4" 
+                class="axis-label-y"
+              >
+                {{ line.value }}
+              </text>
+            </g>
+
+            <!-- Barras por Área -->
+            <g>
+              <g 
+                *ngFor="let bar of config.bars"
+                (mouseenter)="mostrarTooltip({ x: bar.x + bar.width/2, y: bar.y, value: bar.value, label: bar.label })"
+                (mouseleave)="ocultarTooltip()"
+                class="interactive-point-group"
+              >
+                <rect 
+                  [attr.x]="bar.x"
+                  [attr.y]="bar.y"
+                  [attr.width]="bar.width"
+                  [attr.height]="bar.height"
+                  class="chart-bar-area"
+                  rx="6"
+                  fill="url(#areaBlueGradient)"
+                />
+                
+                <!-- Valor flotante -->
+                <text 
+                  [attr.x]="bar.x + bar.width/2" 
+                  [attr.y]="bar.y - 8" 
+                  class="point-value-label"
+                >
+                  {{ bar.value }}
+                </text>
+                
+                <!-- Label Área (eje X) -->
+                <text 
+                  [attr.x]="bar.x + bar.width/2" 
+                  [attr.y]="config.height - 20" 
+                  class="axis-label-x-truncated"
+                >
+                  {{ bar.label.length > 10 ? (bar.label | slice:0:8) + '..' : bar.label }}
+                  <title>{{ bar.label }}</title>
+                </text>
+              </g>
+            </g>
+
+            <defs>
+              <linearGradient id="areaBlueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#1d4ed8" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <!-- Tooltip flotante para áreas -->
+          <div 
+            class="chart-tooltip" 
+            *ngIf="activeTooltip() as tooltip"
+            [style.left.px]="tooltip.x + 35"
+            [style.top.px]="tooltip.y - 40"
+          >
+            <div class="tooltip-header" style="border: none; margin: 0; padding: 0;">
+              <strong>{{ tooltip.label }}</strong>
+              <span class="tooltip-score">{{ tooltip.value }} pts</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Panel de Métricas de Resumen -->
       <section class="metrics-sidebar">
         <article class="metric-card-summary bg-gradient-blue">
@@ -248,6 +341,88 @@
       </section>
 
     </div>
+
+    <!-- Gráfica Comparativa Multi-anual de Áreas -->
+    <section class="card chart-card full-width-card" *ngIf="!isSingleYear() && multiYearAreaChartConfig() as config">
+      <div class="card-header">
+        <div>
+          <h4>Comparación por Áreas en el Tiempo</h4>
+          <p>Análisis evolutivo de calificaciones promedio agrupadas por departamento.</p>
+        </div>
+        <div class="chart-legend" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <span class="legend-item" *ngFor="let item of config.legend">
+            <span class="legend-dot" [style.background-color]="item.color"></span>
+            Año {{ item.year }}
+          </span>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <svg [attr.viewBox]="'0 0 ' + config.width + ' ' + config.height" class="svg-chart-element">
+          <!-- Grid Lines -->
+          <g>
+            <line 
+              *ngFor="let line of config.gridLines" 
+              [attr.x1]="config.paddingLeft" 
+              [attr.y1]="line.y" 
+              [attr.x2]="config.width - 30" 
+              [attr.y2]="line.y" 
+              class="grid-line"
+            />
+            <text 
+              *ngFor="let line of config.gridLines" 
+              [attr.x]="config.paddingLeft - 12" 
+              [attr.y]="line.y + 4" 
+              class="axis-label-y"
+            >
+              {{ line.value }}
+            </text>
+          </g>
+
+          <!-- Grupos de barras por área -->
+          <g>
+            <g *ngFor="let grp of config.groups">
+              <!-- Barra individual -->
+              <rect 
+                *ngFor="let bar of grp.bars"
+                [attr.x]="bar.x"
+                [attr.y]="bar.y"
+                [attr.width]="bar.width"
+                [attr.height]="bar.height"
+                [attr.fill]="bar.color"
+                (mouseenter)="mostrarTooltip({ x: bar.x + bar.width/2, y: bar.y, value: bar.value, label: grp.areaName + ' (' + bar.year + ')' })"
+                (mouseleave)="ocultarTooltip()"
+                class="chart-bar-grouped"
+                rx="2"
+              />
+
+              <!-- Label eje X -->
+              <text 
+                [attr.x]="grp.centerX" 
+                [attr.y]="config.height - 20" 
+                class="axis-label-x-truncated"
+              >
+                {{ grp.areaName.length > 10 ? (grp.areaName | slice:0:8) + '..' : grp.areaName }}
+                <title>{{ grp.areaName }}</title>
+              </text>
+            </g>
+          </g>
+        </svg>
+
+        <!-- Tooltip flotante para barras agrupadas -->
+        <div 
+          class="chart-tooltip" 
+          *ngIf="activeTooltip() as tooltip"
+          [style.left.px]="tooltip.x + 35"
+          [style.top.px]="tooltip.y - 40"
+        >
+          <div class="tooltip-header" style="border: none; margin: 0; padding: 0;">
+            <strong>{{ tooltip.label }}</strong>
+            <span class="tooltip-score">{{ tooltip.value }} pts</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Tabla Detallada de Respuestas -->
     <section class="card table-card">

@@ -14,6 +14,7 @@ export interface EdsCatalogos {
   areas: CatalogoItem[];
   empresas: CatalogoItem[];
   instrumentos: CatalogoItem[];
+  anios: number[];
 }
 
 @Injectable({

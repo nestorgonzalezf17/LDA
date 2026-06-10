@@ -24,7 +24,11 @@
           <a *ngIf="hasRole(['ADMIN'])" routerLink="/reportes/empleados" routerLinkActive="active">
             Reporte por empleado
           </a>
-          <a *ngIf="hasRole(['ADMIN'])" routerLink="/reportes/eds-dashboard" routerLinkActive="active">
+        </ng-container>
+
+        <ng-container *ngIf="hasRole(['ADMIN'])">
+          <div class="sidebar-divider">EDS - ENCUESTAS</div>
+          <a routerLink="/reportes/eds-dashboard" routerLinkActive="active">
             Dashboard EDS (Clima)
           </a>
         </ng-container>

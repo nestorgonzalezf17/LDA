@@ -55,4 +55,22 @@ public class CatalogoRepository : ICatalogoRepository
             "SELECT IdInst AS Id, Titulo FROM [EDS].[Instrumento] ORDER BY Titulo"
         );
     }
+
+    public async Task<IEnumerable<int>> ListarAniosEncuestasAsync()
+    {
+        using var connection = _connectionFactory.CreateConnection();
+        var anios = (await connection.QueryAsync<int>(
+            "SELECT DISTINCT Anio FROM [EDS].[Formulario] ORDER BY Anio DESC"
+        )).AsList();
+
+        if (anios.Count == 0)
+        {
+            int anioActual = System.DateTime.Today.Year;
+            for (int i = 0; i < 5; i++)
+            {
+                anios.Add(anioActual - i);
+            }
+        }
+        return anios;
+    }
 }
